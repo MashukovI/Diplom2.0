@@ -70,21 +70,21 @@ public class GroupManagementForm : Form
         this.removeStudentButton.Text = "Remove Student";
         this.removeStudentButton.Click += new EventHandler(RemoveStudentButton_Click);
 
-        this.groupNameTextBox.Location = new System.Drawing.Point(10, 220);
+        this.groupNameTextBox.Location = new System.Drawing.Point(10, 240);
         this.groupNameTextBox.Size = new System.Drawing.Size(200, 20);
         this.groupNameTextBox.Text = "Group Name";
 
-        this.editGroupButton.Location = new System.Drawing.Point(220, 220);
+        this.editGroupButton.Location = new System.Drawing.Point(220, 240);
         this.editGroupButton.Size = new System.Drawing.Size(100, 30);
         this.editGroupButton.Text = "Edit Group";
         this.editGroupButton.Click += new EventHandler(EditGroupButton_Click);
 
-        this.createGroupButton.Location = new System.Drawing.Point(330, 220);
+        this.createGroupButton.Location = new System.Drawing.Point(330, 240);
         this.createGroupButton.Size = new System.Drawing.Size(100, 30);
         this.createGroupButton.Text = "Create Group";
         this.createGroupButton.Click += new EventHandler(CreateGroupButton_Click);
 
-        this.deleteGroupButton.Location = new System.Drawing.Point(440, 220);
+        this.deleteGroupButton.Location = new System.Drawing.Point(440, 240);
         this.deleteGroupButton.Size = new System.Drawing.Size(100, 30);
         this.deleteGroupButton.Text = "Delete Group";
         this.deleteGroupButton.Click += new EventHandler(DeleteGroupButton_Click);
@@ -103,7 +103,7 @@ public class GroupManagementForm : Form
 
         // Настройка формы
         this.Text = "Group Management";
-        this.Size = new System.Drawing.Size(850, 300);
+        this.Size = new System.Drawing.Size(850, 330);
     }
 
     private void LoadGroups()

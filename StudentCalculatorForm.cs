@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 
 public class StudentCalculatorForm : Form
 {
+    private Label userNameLabel;
     private ComboBox modeComboBox;
     private Panel inputPanel;
     private Panel outputPanel;
@@ -28,21 +29,23 @@ public class StudentCalculatorForm : Form
 
     private void InitializeForm()
     {
+        userNameLabel = new Label
+        {
+            Location = new Point(250, 10), // Позиция на форме
+            AutoSize = true, // Автоматический размер
+            Font = new Font("Times New Roman", 12, FontStyle.Bold), // Шрифт
+            ForeColor = Color.Black, // Цвет текста
+            Text = $"Пользователь: {LoginForm.CurrentUserName}" // Текст с именем пользователя
+        };
+        this.Controls.Add(userNameLabel);
         this.Size = new Size(1000, 600); // Увеличена форма
         this.Text = "Engineering Calculator";
 
-        // PictureBox для изображений
-        modePictureBox = new PictureBox
-        {
-            Location = new Point(550, 40),
-            Size = new Size(400, 400),
-            SizeMode = PictureBoxSizeMode.Zoom,
-            BorderStyle = BorderStyle.FixedSingle
-        };
+       
         this.Controls.Add(modePictureBox);
 
         this.Text = "Student Calculator";
-        this.Size = new Size(800, 500);
+        this.Size = new Size(550, 500);
 
         // ComboBox для выбора режима
         modeComboBox = new ComboBox { Location = new Point(10, 10), Width = 200 };
@@ -214,6 +217,7 @@ public abstract class CalculationMode
     public abstract Dictionary<string, string> InputLabels { get; }
     public abstract Dictionary<string, string> OutputLabels { get; }
     public abstract double[] Calculate(double[] inputs);
+    public abstract string ImagePath { get; }
 }
 public class SquareOvalMode : CalculationMode
 {
@@ -233,13 +237,14 @@ public class SquareOvalMode : CalculationMode
         {"Result1", "Результат 1"},
         {"Result2", "Результат 2"},
         {"Result3", "Результат 3"},
-
     };
 
     public override double[] Calculate(double[] inputs)
     {
         return CalculationModule.CalculateSquareOval(inputs);
     }
+
+    public override string ImagePath => "square_oval.PNG"; // Путь к изображению для режима
 }
 
 public class SquareRhombusMode : CalculationMode
@@ -254,7 +259,6 @@ public class SquareRhombusMode : CalculationMode
         {"KoefVit", "Коэффициент вытяжки"},
         {"MarkSt", "Марка стали"},
         {"Temp", "Температура раската"},
-        {"Diam", "Кон. диаметр изделия"},
         {"NachDVal", "Нач диаметр валков"},
         {"A1", "A1"},
         {"StZapKalib1", "Кон. ст. заполнения калибра"}
@@ -265,11 +269,12 @@ public class SquareRhombusMode : CalculationMode
         {"Result1", "Результат 1"},
         {"Result2", "Результат 2"},
         {"Result3", "Результат 3"},
-
     };
 
     public override double[] Calculate(double[] inputs)
     {
         return CalculationModule.CalculateSquareRhombus(inputs);
     }
+
+    public override string ImagePath => "Images/square_rhombus.PNG"; // Путь к изображению для режима
 }

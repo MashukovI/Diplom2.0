@@ -22,3 +22,6 @@ D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.csproj.CoreCompileInputs.cache
 D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.csproj.Up2Date
 D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.exe
 D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.pdb
+D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.g.resources
+D:\Diplom\TEST\Test\Diplom2.0\bin\Debug\Images\hexagon_square.PNG
+D:\Diplom\TEST\Test\Diplom2.0\bin\Debug\Images\square_oval.PNG

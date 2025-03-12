@@ -50,8 +50,8 @@ public static class CalculationModule
     // Режим "Квадрат-Ромб"
     public static double[] CalculateSquareRhombus(double[] inputs)
     {
-        if (inputs.Length != 10)
-            throw new ArgumentException("Для режима 'Квадрат-Ромб' требуется 10 входных параметров.");
+        if (inputs.Length != 9)
+            throw new ArgumentException("Для режима 'Квадрат-Ромб' требуется 9 входных параметров.");
 
         double width0 = inputs[0];
         double stZapKalib = inputs[1];
@@ -59,10 +59,10 @@ public static class CalculationModule
         double koefVit = inputs[3];
         double MarkSt = inputs[4];
         double Temp = inputs[5];
-        double Diam = inputs[6];
-        double NachDVal = inputs[7];
-        double StZapKalib1 = inputs[8];
-        double A1 = inputs[9];
+
+        double NachDVal = inputs[6];
+        double StZapKalib1 = inputs[7];
+        double A1 = inputs[8];
 
 
         // Получаем ближайшее значение трения

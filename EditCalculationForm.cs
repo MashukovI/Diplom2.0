@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 public class EditCalculationForm : Form
 {
     private TextBox txtWidth0, txtStZapKalib, txtRscrug, txtKoefVit,
-                  txtMarkSt, txtTemp, txtNachDVal, txtDiam, txtA1, txtStZapKalib1,
+                  txtMarkSt, txtTemp, txtNachDVal, txtA1, txtStZapKalib1,
                   txtResult1, txtResult2, txtResult3, txtResult4, txtResult5, txtResult6;
     private Button btnSave;
     private int _calculationId;
@@ -21,23 +21,22 @@ public class EditCalculationForm : Form
     private readonly Dictionary<string, string[]> _modeParameters = new Dictionary<string, string[]>
     {
         { "Квадрат-Овал", new[] { "Width0", "StZapKalib", "Rscrug", "KoefVit", "Temp" } },
-        { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "KoefVit", "MarkSt", "Temp", "NachDVal", "Diam", "A1", "StZapKalib1" } },
+        { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "KoefVit", "MarkSt", "Temp", "NachDVal", "A1", "StZapKalib1" } },
         { "Шестиугольник-Квадрат", new[] { "Width0", "MarkSt", "NachDVal" } }
     };
 
     // Словарь для отображения пользовательских названий
     private readonly Dictionary<string, string> _parameterDisplayNames = new Dictionary<string, string>
     {
-        { "Width0", "Ширина заготовки" },
-        { "StZapKalib", "Сталь заготовки" },
-        { "Rscrug", "Радиус скругления" },
-        { "KoefVit", "Коэффициент витка" },
-        { "MarkSt", "Марка стали" },
-        { "Temp", "Температура" },
-        { "NachDVal", "Начальное значение диаметра" },
-        { "Diam", "Диаметр" },
-        { "A1", "Параметр A1" },
-        { "StZapKalib1", "Сталь заготовки 1" }
+        {"Width0", "Ширина"},
+        {"StZapKalib", "Нач. ст. заполнения калибра"},
+        {"Rscrug", "Радиус скругления"},
+        {"KoefVit", "Коэффициент вытяжки"},
+        {"MarkSt", "Марка стали"},
+        {"Temp", "Температура раската"},
+        {"NachDVal", "Нач диаметр валков"},
+        {"A1", "A1"},
+        {"StZapKalib1", "Кон. ст. заполнения калибра"}
     };
 
     public EditCalculationForm(DatabaseService databaseService, int calculationId)
@@ -62,7 +61,7 @@ public class EditCalculationForm : Form
         txtMarkSt = CreateLabeledTextBox("MarkSt:", ref y);
         txtTemp = CreateLabeledTextBox("Temp:", ref y);
         txtNachDVal = CreateLabeledTextBox("NachDVal:", ref y);
-        txtDiam = CreateLabeledTextBox("Diam:", ref y);
+
         txtA1 = CreateLabeledTextBox("A1:", ref y);
         txtStZapKalib1 = CreateLabeledTextBox("StZapKalib1:", ref y);
 
@@ -205,11 +204,7 @@ public class EditCalculationForm : Form
                         txtNachDVal.Text = inputParameters["NachDVal"].ToString();
                         FindLabelByTextBox(txtNachDVal).Visible = true; // Показываем лейбл
                         break;
-                    case "Diam":
-                        txtDiam.Visible = true;
-                        txtDiam.Text = inputParameters["Diam"].ToString();
-                        FindLabelByTextBox(txtDiam).Visible = true; // Показываем лейбл
-                        break;
+
                     case "A1":
                         txtA1.Visible = true;
                         txtA1.Text = inputParameters["A1"].ToString();
@@ -260,7 +255,6 @@ public class EditCalculationForm : Form
             if (txtMarkSt.Visible) inputParameters["MarkSt"] = double.Parse(txtMarkSt.Text);
             if (txtTemp.Visible) inputParameters["Temp"] = double.Parse(txtTemp.Text);
             if (txtNachDVal.Visible) inputParameters["NachDVal"] = double.Parse(txtNachDVal.Text);
-            if (txtDiam.Visible) inputParameters["Diam"] = double.Parse(txtDiam.Text);
             if (txtA1.Visible) inputParameters["A1"] = double.Parse(txtA1.Text);
             if (txtStZapKalib1.Visible) inputParameters["StZapKalib1"] = double.Parse(txtStZapKalib1.Text);
 

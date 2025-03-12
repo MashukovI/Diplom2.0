@@ -19,11 +19,22 @@ public class OperationHistoryForm : Form
     // Словарь для хранения параметров каждого режима
     private readonly Dictionary<string, string[]> _modeParameters = new Dictionary<string, string[]>
     {
-        { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "Temp", "KoefVit", "MarkSt", "NachDVal", "Diam", "A1", "StZapKalib1", "Result1", "Result2", "Result3" } },
+        { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "Temp", "KoefVit", "MarkSt", "NachDVal", "A1", "StZapKalib1", "Result1", "Result2", "Result3" } },
         { "Квадрат-Овал", new[] { "Width0", "StZapKalib", "Rscrug", "KoefVit", "Result1", "Result2" } },
         { "Шестиугольник-Квадрат", new[] { "Width0", "MarkSt", "NachDVal", "Result1" } }
     };
-
+    private readonly Dictionary<string, string> _parameterDisplayNames = new Dictionary<string, string>
+{
+        {"Width0", "Ширина"},
+        {"StZapKalib", "Нач. ст. заполнения калибра"},
+        {"Rscrug", "Радиус скругления"},
+        {"KoefVit", "Коэффициент вытяжки"},
+        {"MarkSt", "Марка стали"},
+        {"Temp", "Температура раската"},
+        {"NachDVal", "Нач диаметр валков"},
+        {"A1", "A1"},
+        {"StZapKalib1", "Кон. ст. заполнения калибра"}
+};
     public OperationHistoryForm(DatabaseService databaseService)
     {
         _databaseService = databaseService;
@@ -103,7 +114,7 @@ public class OperationHistoryForm : Form
         LoadData(selectedOperationType);
     }
 
-    private void LoadData(string mode = "Квадрат-Ромб")
+    private void LoadData(string mode = "Квадрат-Овал")
     {
         try
         {
@@ -114,29 +125,29 @@ public class OperationHistoryForm : Form
             }
 
             string query = @"
-                SELECT 
-                    oh.Id,
-                    oh.OperationType,
-                    oh.InputParameters,
-                    oh.OutputParameters,
-                    oh.CalculationDate,
-                    u.Username AS UserName
-                FROM OperationHistory oh
-                LEFT JOIN Users u ON oh.UserId = u.UserId
-                WHERE 
-                    oh.OperationType = @OperationType
-                    AND (
-                        (@IsTeacher = 1 AND u.GroupId IN 
-                            (SELECT GroupId FROM Groups WHERE TeacherId = @TeacherId))
-                        OR (@IsTeacher = 0 AND oh.UserId = @UserId)
-                    )";
+            SELECT 
+                oh.Id,
+                oh.OperationType,
+                oh.InputParameters,
+                oh.OutputParameters,
+                oh.CalculationDate,
+                u.Username AS UserName
+            FROM OperationHistory oh
+            LEFT JOIN Users u ON oh.UserId = u.UserId
+            WHERE 
+                oh.OperationType = @OperationType
+                AND (
+                    (@IsTeacher = 1 AND u.GroupId IN 
+                        (SELECT GroupId FROM Groups WHERE TeacherId = @TeacherId))
+                    OR (@IsTeacher = 0 AND oh.UserId = @UserId)
+                )";
 
             SqlParameter[] parameters = {
-                new SqlParameter("@IsTeacher", LoginForm.CurrentUserRole == "Teacher" ? 1 : 0),
-                new SqlParameter("@TeacherId", LoginForm.CurrentUserId),
-                new SqlParameter("@UserId", LoginForm.CurrentUserId),
-                new SqlParameter("@OperationType", mode)
-            };
+            new SqlParameter("@IsTeacher", LoginForm.CurrentUserRole == "Teacher" ? 1 : 0),
+            new SqlParameter("@TeacherId", LoginForm.CurrentUserId),
+            new SqlParameter("@UserId", LoginForm.CurrentUserId),
+            new SqlParameter("@OperationType", mode)
+        };
 
             DataTable dt = _databaseService.ExecuteQuery(query, parameters);
             ConfigureGridColumns(mode);
@@ -173,10 +184,10 @@ public class OperationHistoryForm : Form
                 }
 
                 var rowValues = new List<object>
-                {
-                    row["Id"],
-                    row["CalculationDate"]
-                };
+            {
+                row["Id"],
+                row["CalculationDate"]
+            };
 
                 if (LoginForm.CurrentUserRole == "Teacher")
                 {
@@ -213,6 +224,7 @@ public class OperationHistoryForm : Form
     {
         historyDataGridView.Columns.Clear();
 
+        // Добавляем стандартные колонки
         historyDataGridView.Columns.Add("Id", "ID");
         historyDataGridView.Columns.Add("CalculationDate", "Дата расчета");
 
@@ -221,14 +233,21 @@ public class OperationHistoryForm : Form
             historyDataGridView.Columns.Add("UserName", "Пользователь");
         }
 
+        // Добавляем колонки для параметров режима
         if (_modeParameters.ContainsKey(mode))
         {
             foreach (var parameter in _modeParameters[mode])
             {
-                historyDataGridView.Columns.Add(parameter, parameter);
+                // Используем словарь для получения пользовательского названия
+                string displayName = _parameterDisplayNames.ContainsKey(parameter)
+                    ? _parameterDisplayNames[parameter]
+                    : parameter;
+
+                historyDataGridView.Columns.Add(parameter, displayName);
             }
         }
 
+        // Скрываем колонку Id
         historyDataGridView.Columns["Id"].Visible = false;
     }
 
