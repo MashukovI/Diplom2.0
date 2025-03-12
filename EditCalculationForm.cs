@@ -3,18 +3,42 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 
 public class EditCalculationForm : Form
 {
-    // Объявляем элементы управления
     private TextBox txtWidth0, txtStZapKalib, txtRscrug, txtKoefVit,
-                  txtMarkSt, txtTemp, txtNachDVal, txtResult1,
-                  txtResult2, txtResult3;
+                  txtMarkSt, txtTemp, txtNachDVal, txtDiam, txtA1, txtStZapKalib1,
+                  txtResult1, txtResult2, txtResult3, txtResult4, txtResult5, txtResult6;
     private Button btnSave;
     private int _calculationId;
     private DatabaseService _databaseService;
+    private string _operationType;
+
+    // Словарь для хранения параметров каждого режима
+    private readonly Dictionary<string, string[]> _modeParameters = new Dictionary<string, string[]>
+    {
+        { "Квадрат-Овал", new[] { "Width0", "StZapKalib", "Rscrug", "KoefVit", "Temp" } },
+        { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "KoefVit", "MarkSt", "Temp", "NachDVal", "Diam", "A1", "StZapKalib1" } },
+        { "Шестиугольник-Квадрат", new[] { "Width0", "MarkSt", "NachDVal" } }
+    };
+
+    // Словарь для отображения пользовательских названий
+    private readonly Dictionary<string, string> _parameterDisplayNames = new Dictionary<string, string>
+    {
+        { "Width0", "Ширина заготовки" },
+        { "StZapKalib", "Сталь заготовки" },
+        { "Rscrug", "Радиус скругления" },
+        { "KoefVit", "Коэффициент витка" },
+        { "MarkSt", "Марка стали" },
+        { "Temp", "Температура" },
+        { "NachDVal", "Начальное значение диаметра" },
+        { "Diam", "Диаметр" },
+        { "A1", "Параметр A1" },
+        { "StZapKalib1", "Сталь заготовки 1" }
+    };
 
     public EditCalculationForm(DatabaseService databaseService, int calculationId)
     {
@@ -26,7 +50,7 @@ public class EditCalculationForm : Form
 
     private void InitializeComponents()
     {
-        this.Size = new Size(400, 450);
+        this.Size = new Size(500, 700); // Увеличиваем высоту формы для новых полей
         this.Text = "Edit Calculation";
 
         // Создаем и размещаем элементы
@@ -38,9 +62,23 @@ public class EditCalculationForm : Form
         txtMarkSt = CreateLabeledTextBox("MarkSt:", ref y);
         txtTemp = CreateLabeledTextBox("Temp:", ref y);
         txtNachDVal = CreateLabeledTextBox("NachDVal:", ref y);
+        txtDiam = CreateLabeledTextBox("Diam:", ref y);
+        txtA1 = CreateLabeledTextBox("A1:", ref y);
+        txtStZapKalib1 = CreateLabeledTextBox("StZapKalib1:", ref y);
+
+        // Поля результатов (заблокированы для редактирования)
         txtResult1 = CreateLabeledTextBox("Result1:", ref y);
+        txtResult1.ReadOnly = true;
         txtResult2 = CreateLabeledTextBox("Result2:", ref y);
+        txtResult2.ReadOnly = true;
         txtResult3 = CreateLabeledTextBox("Result3:", ref y);
+        txtResult3.ReadOnly = true;
+        txtResult4 = CreateLabeledTextBox("Result4:", ref y);
+        txtResult4.ReadOnly = true;
+        txtResult5 = CreateLabeledTextBox("Result5:", ref y);
+        txtResult5.ReadOnly = true;
+        txtResult6 = CreateLabeledTextBox("Result6:", ref y);
+        txtResult6.ReadOnly = true;
 
         // Кнопка сохранения
         btnSave = new Button
@@ -53,18 +91,23 @@ public class EditCalculationForm : Form
         this.Controls.Add(btnSave);
     }
 
-    private TextBox CreateLabeledTextBox(string labelText, ref int y)
+    private TextBox CreateLabeledTextBox(string parameterName, ref int y)
     {
+        // Получаем пользовательское название для параметра
+        string displayName = _parameterDisplayNames.ContainsKey(parameterName)
+            ? _parameterDisplayNames[parameterName]
+            : parameterName;
+
         var label = new Label
         {
-            Text = labelText,
+            Text = displayName,
             Location = new Point(10, y),
-            Width = 100
+            Width = 150
         };
 
         var textBox = new TextBox
         {
-            Location = new Point(120, y),
+            Location = new Point(170, y),
             Width = 150
         };
 
@@ -74,33 +117,189 @@ public class EditCalculationForm : Form
         return textBox;
     }
 
+    private void LoadCalculation()
+    {
+        string query = "SELECT * FROM OperationHistory WHERE Id = @Id";
+        SqlParameter[] parameters = { new SqlParameter("@Id", _calculationId) };
+
+        try
+        {
+            DataTable dt = _databaseService.ExecuteQuery(query, parameters);
+            if (dt.Rows.Count > 0)
+            {
+                DataRow row = dt.Rows[0];
+                _operationType = row["OperationType"].ToString();
+
+                // Десериализация InputParameters
+                var inputParameters = JsonConvert.DeserializeObject<Dictionary<string, double>>(row["InputParameters"].ToString());
+
+                // Десериализация OutputParameters
+                var outputParameters = JsonConvert.DeserializeObject<double[]>(row["OutputParameters"].ToString());
+
+                // Отображаем только те поля, которые нужны для текущего режима
+                ShowFieldsForMode(_operationType, inputParameters, outputParameters);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Ошибка загрузки данных: {ex.Message}");
+        }
+    }
+
+    private void ShowFieldsForMode(string mode, Dictionary<string, double> inputParameters, double[] outputParameters)
+    {
+        // Скрываем все поля и лейблы
+        foreach (var control in this.Controls)
+        {
+            if (control is TextBox textBox && textBox != txtResult1 && textBox != txtResult2 && textBox != txtResult3 &&
+                textBox != txtResult4 && textBox != txtResult5 && textBox != txtResult6)
+            {
+                textBox.Visible = false;
+            }
+            if (control is Label label && label.Text != "Result1:" && label.Text != "Result2:" && label.Text != "Result3:" &&
+                label.Text != "Result4:" && label.Text != "Result5:" && label.Text != "Result6:")
+            {
+                label.Visible = false;
+            }
+        }
+
+        // Показываем только те поля и лейблы, которые нужны для текущего режима
+        if (_modeParameters.ContainsKey(mode))
+        {
+            foreach (var parameter in _modeParameters[mode])
+            {
+                switch (parameter)
+                {
+                    case "Width0":
+                        txtWidth0.Visible = true;
+                        txtWidth0.Text = inputParameters["Width0"].ToString();
+                        FindLabelByTextBox(txtWidth0).Visible = true; // Показываем лейбл
+                        break;
+                    case "StZapKalib":
+                        txtStZapKalib.Visible = true;
+                        txtStZapKalib.Text = inputParameters["StZapKalib"].ToString();
+                        FindLabelByTextBox(txtStZapKalib).Visible = true; // Показываем лейбл
+                        break;
+                    case "Rscrug":
+                        txtRscrug.Visible = true;
+                        txtRscrug.Text = inputParameters["Rscrug"].ToString();
+                        FindLabelByTextBox(txtRscrug).Visible = true; // Показываем лейбл
+                        break;
+                    case "KoefVit":
+                        txtKoefVit.Visible = true;
+                        txtKoefVit.Text = inputParameters["KoefVit"].ToString();
+                        FindLabelByTextBox(txtKoefVit).Visible = true; // Показываем лейбл
+                        break;
+                    case "MarkSt":
+                        txtMarkSt.Visible = true;
+                        txtMarkSt.Text = inputParameters["MarkSt"].ToString();
+                        FindLabelByTextBox(txtMarkSt).Visible = true; // Показываем лейбл
+                        break;
+                    case "Temp":
+                        txtTemp.Visible = true;
+                        txtTemp.Text = inputParameters["Temp"].ToString();
+                        FindLabelByTextBox(txtTemp).Visible = true; // Показываем лейбл
+                        break;
+                    case "NachDVal":
+                        txtNachDVal.Visible = true;
+                        txtNachDVal.Text = inputParameters["NachDVal"].ToString();
+                        FindLabelByTextBox(txtNachDVal).Visible = true; // Показываем лейбл
+                        break;
+                    case "Diam":
+                        txtDiam.Visible = true;
+                        txtDiam.Text = inputParameters["Diam"].ToString();
+                        FindLabelByTextBox(txtDiam).Visible = true; // Показываем лейбл
+                        break;
+                    case "A1":
+                        txtA1.Visible = true;
+                        txtA1.Text = inputParameters["A1"].ToString();
+                        FindLabelByTextBox(txtA1).Visible = true; // Показываем лейбл
+                        break;
+                    case "StZapKalib1":
+                        txtStZapKalib1.Visible = true;
+                        txtStZapKalib1.Text = inputParameters["StZapKalib1"].ToString();
+                        FindLabelByTextBox(txtStZapKalib1).Visible = true; // Показываем лейбл
+                        break;
+                }
+            }
+        }
+
+        // Отображаем результаты
+        txtResult1.Text = outputParameters.Length > 0 ? outputParameters[0].ToString("F2") : "0";
+        txtResult2.Text = outputParameters.Length > 1 ? outputParameters[1].ToString("F2") : "0";
+        txtResult3.Text = outputParameters.Length > 2 ? outputParameters[2].ToString("F2") : "0";
+        txtResult4.Text = outputParameters.Length > 3 ? outputParameters[3].ToString("F2") : "0";
+        txtResult5.Text = outputParameters.Length > 4 ? outputParameters[4].ToString("F2") : "0";
+        txtResult6.Text = outputParameters.Length > 5 ? outputParameters[5].ToString("F2") : "0";
+    }
+
+    // Вспомогательный метод для поиска лейбла по связанному TextBox
+    private Label FindLabelByTextBox(TextBox textBox)
+    {
+        foreach (var control in this.Controls)
+        {
+            if (control is Label label && label.Location.Y == textBox.Location.Y)
+            {
+                return label;
+            }
+        }
+        return null;
+    }
+
     private void BtnSave_Click(object sender, EventArgs e)
     {
-        // Создаем словарь для входных параметров
-        var inputParameters = new Dictionary<string, double>
+        try
         {
-            { "Width0", Convert.ToDouble(txtWidth0.Text) },
-            { "StZapKalib", Convert.ToDouble(txtStZapKalib.Text) },
-            { "Rscrug", Convert.ToDouble(txtRscrug.Text) },
-            { "KoefVit", Convert.ToDouble(txtKoefVit.Text) },
-            { "MarkSt", Convert.ToDouble(txtMarkSt.Text) },
-            { "Temp", Convert.ToDouble(txtTemp.Text) },
-            { "NachDVal", Convert.ToDouble(txtNachDVal.Text) }
-        };
+            // Сбор входных данных
+            var inputParameters = new Dictionary<string, double>();
 
-        // Создаем массив для выходных параметров
-        var outputParameters = new[]
+            if (txtWidth0.Visible) inputParameters["Width0"] = double.Parse(txtWidth0.Text);
+            if (txtStZapKalib.Visible) inputParameters["StZapKalib"] = double.Parse(txtStZapKalib.Text);
+            if (txtRscrug.Visible) inputParameters["Rscrug"] = double.Parse(txtRscrug.Text);
+            if (txtKoefVit.Visible) inputParameters["KoefVit"] = double.Parse(txtKoefVit.Text);
+            if (txtMarkSt.Visible) inputParameters["MarkSt"] = double.Parse(txtMarkSt.Text);
+            if (txtTemp.Visible) inputParameters["Temp"] = double.Parse(txtTemp.Text);
+            if (txtNachDVal.Visible) inputParameters["NachDVal"] = double.Parse(txtNachDVal.Text);
+            if (txtDiam.Visible) inputParameters["Diam"] = double.Parse(txtDiam.Text);
+            if (txtA1.Visible) inputParameters["A1"] = double.Parse(txtA1.Text);
+            if (txtStZapKalib1.Visible) inputParameters["StZapKalib1"] = double.Parse(txtStZapKalib1.Text);
+
+            // Пересчет результатов
+            double[] results;
+            switch (_operationType)
+            {
+                case "Квадрат-Ромб":
+                    results = CalculationModule.CalculateSquareRhombus(inputParameters.Values.ToArray());
+                    break;
+                case "Квадрат-Овал":
+                    results = CalculationModule.CalculateSquareOval(inputParameters.Values.ToArray());
+                    break;
+                case "Шестиугольник-Квадрат":
+                    results = CalculationModule.CalculateHexagonSquare(inputParameters.Values.ToArray());
+                    break;
+                default:
+                    throw new InvalidOperationException("Неизвестный режим расчета.");
+            }
+
+            // Обновление результатов на форме
+            txtResult1.Text = results[0].ToString("F2");
+            txtResult2.Text = results[1].ToString("F2");
+            txtResult3.Text = results[2].ToString("F2");
+            txtResult4.Text = results.Length > 3 ? results[3].ToString("F2") : "0";
+            txtResult5.Text = results.Length > 4 ? results[4].ToString("F2") : "0";
+            txtResult6.Text = results.Length > 5 ? results[5].ToString("F2") : "0";
+
+            // Сохранение в базу данных
+            SaveCalculation(inputParameters, results);
+        }
+        catch (Exception ex)
         {
-            Convert.ToDouble(txtResult1.Text),
-            Convert.ToDouble(txtResult2.Text),
-            Convert.ToDouble(txtResult3.Text)
-        };
+            MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
 
-        // Сериализуем входные и выходные параметры в JSON
-        string inputJson = JsonConvert.SerializeObject(inputParameters);
-        string outputJson = JsonConvert.SerializeObject(outputParameters);
-
-        // SQL-запрос для обновления данных
+    private void SaveCalculation(Dictionary<string, double> inputParameters, double[] results)
+    {
         string query = @"
             UPDATE OperationHistory 
             SET 
@@ -109,50 +308,21 @@ public class EditCalculationForm : Form
             WHERE Id = @Id";
 
         SqlParameter[] parameters = {
-            new SqlParameter("@InputParameters", inputJson),
-            new SqlParameter("@OutputParameters", outputJson),
+            new SqlParameter("@InputParameters", JsonConvert.SerializeObject(inputParameters)),
+            new SqlParameter("@OutputParameters", JsonConvert.SerializeObject(results)),
             new SqlParameter("@Id", _calculationId)
         };
 
         try
         {
             _databaseService.ExecuteNonQuery(query, parameters);
-            MessageBox.Show("Changes saved successfully!");
+            MessageBox.Show("Изменения сохранены успешно!");
+            this.DialogResult = DialogResult.OK;
             this.Close();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error saving changes: {ex.Message}");
-        }
-    }
-
-    private void LoadCalculation()
-    {
-        string query = "SELECT InputParameters, OutputParameters FROM OperationHistory WHERE Id = @Id";
-        SqlParameter[] parameters = { new SqlParameter("@Id", _calculationId) };
-
-        DataTable dt = _databaseService.ExecuteQuery(query, parameters);
-        if (dt.Rows.Count > 0)
-        {
-            DataRow row = dt.Rows[0];
-
-            // Десериализуем входные параметры
-            var inputParameters = JsonConvert.DeserializeObject<Dictionary<string, double>>(row["InputParameters"].ToString());
-
-            // Заполняем текстовые поля, проверяя наличие ключей
-            txtWidth0.Text = inputParameters.TryGetValue("Width0", out double width0) ? width0.ToString() : "0";
-            txtStZapKalib.Text = inputParameters.TryGetValue("StZapKalib", out double stZapKalib) ? stZapKalib.ToString() : "0";
-            txtRscrug.Text = inputParameters.TryGetValue("Rscrug", out double rscrug) ? rscrug.ToString() : "0";
-            txtKoefVit.Text = inputParameters.TryGetValue("KoefVit", out double koefVit) ? koefVit.ToString() : "0";
-            txtMarkSt.Text = inputParameters.TryGetValue("MarkSt", out double markSt) ? markSt.ToString() : "0";
-            txtTemp.Text = inputParameters.TryGetValue("Temp", out double temp) ? temp.ToString() : "0";
-            txtNachDVal.Text = inputParameters.TryGetValue("NachDVal", out double nachDVal) ? nachDVal.ToString() : "0";
-
-            // Десериализуем выходные параметры
-            var outputParameters = JsonConvert.DeserializeObject<double[]>(row["OutputParameters"].ToString());
-            txtResult1.Text = outputParameters.Length > 0 ? outputParameters[0].ToString() : "0";
-            txtResult2.Text = outputParameters.Length > 1 ? outputParameters[1].ToString() : "0";
-            txtResult3.Text = outputParameters.Length > 2 ? outputParameters[2].ToString() : "0";
+            MessageBox.Show($"Ошибка сохранения: {ex.Message}");
         }
     }
 }

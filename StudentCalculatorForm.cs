@@ -50,23 +50,23 @@ public class StudentCalculatorForm : Form
         this.Controls.Add(modeComboBox);
 
         // Панели для динамических элементов
-        inputPanel = new Panel { Location = new Point(10, 40), Size = new Size(250, 200) };
-        outputPanel = new Panel { Location = new Point(270, 40), Size = new Size(250, 200) };
+        inputPanel = new Panel { Location = new Point(10, 40), Size = new Size(250, 300) };
+        outputPanel = new Panel { Location = new Point(270, 40), Size = new Size(250, 300) };
         this.Controls.Add(inputPanel);
         this.Controls.Add(outputPanel);
 
         // Кнопка "Calculate"
-        calculateButton = new Button { Location = new Point(10, 250), Size = new Size(100, 30), Text = "Calculate" };
+        calculateButton = new Button { Location = new Point(10, 350), Size = new Size(100, 30), Text = "Calculate" };
         calculateButton.Click += CalculateButton_Click;
         this.Controls.Add(calculateButton);
 
         // Кнопка "History"
-        historyButton = new Button { Location = new Point(120, 250), Size = new Size(100, 30), Text = "History" };
+        historyButton = new Button { Location = new Point(120, 350), Size = new Size(100, 30), Text = "History" };
         historyButton.Click += HistoryButton_Click;
         this.Controls.Add(historyButton);
 
         // Кнопка "Logout"
-        logoutButton = new Button { Location = new Point(230, 250), Size = new Size(100, 30), Text = "Logout" };
+        logoutButton = new Button { Location = new Point(230, 350), Size = new Size(100, 30), Text = "Logout" };
         logoutButton.Click += LogoutButton_Click;
         this.Controls.Add(logoutButton);
     }
@@ -94,8 +94,8 @@ public class StudentCalculatorForm : Form
         int y = 0;
         foreach (var input in currentMode.InputLabels)
         {
-            var label = new Label { Text = input.Value, Location = new Point(0, y), Width = 100 };
-            var textBox = new TextBox { Location = new Point(110, y), Width = 100, Tag = input.Key };
+            var label = new Label { Text = input.Value, Location = new Point(0, y), Width = 140 };
+            var textBox = new TextBox { Location = new Point(140, y), Width = 100, Tag = input.Key };
             inputPanel.Controls.Add(label);
             inputPanel.Controls.Add(textBox);
             y += 30;
@@ -215,30 +215,6 @@ public abstract class CalculationMode
     public abstract Dictionary<string, string> OutputLabels { get; }
     public abstract double[] Calculate(double[] inputs);
 }
-public class SquareRhombusMode : CalculationMode
-{
-    public override string ModeName => "Квадрат-Ромб";
-
-    public override Dictionary<string, string> InputLabels => new Dictionary<string, string>
-    {
-        {"Width0", "Ширина"},
-        {"StZapKalib", "Стальной запас"},
-        {"Rscrug", "Радиус скругления"},
-        {"KoefVit", "Коэффициент витка"}
-    };
-
-    public override Dictionary<string, string> OutputLabels => new Dictionary<string, string>
-    {
-        {"Result1", "Результат 1"},
-        {"Result2", "Результат 2"}
-    };
-
-    public override double[] Calculate(double[] inputs)
-    {
-        // Пример расчета
-        return new[] { inputs[0] * 2, inputs[1] * 3 };
-    }
-}
 public class SquareOvalMode : CalculationMode
 {
     public override string ModeName => "Квадрат-Овал";
@@ -249,19 +225,51 @@ public class SquareOvalMode : CalculationMode
         {"StZapKalib", "Стальной запас"},
         {"Rscrug", "Радиус скругления"},
         {"KoefVit", "Коэффициент витка"},
-        {"Temp", "Температура"}
+        {"Temp", "Температура"},
     };
 
     public override Dictionary<string, string> OutputLabels => new Dictionary<string, string>
     {
         {"Result1", "Результат 1"},
         {"Result2", "Результат 2"},
-        {"Result3", "Результат 3"}
+        {"Result3", "Результат 3"},
+
     };
 
     public override double[] Calculate(double[] inputs)
     {
-        // Пример расчета
-        return new[] { inputs[0] * 1.5, inputs[1] * 2.5, inputs[4] * 10 };
+        return CalculationModule.CalculateSquareOval(inputs);
+    }
+}
+
+public class SquareRhombusMode : CalculationMode
+{
+    public override string ModeName => "Квадрат-Ромб";
+
+    public override Dictionary<string, string> InputLabels => new Dictionary<string, string>
+    {
+        {"Width0", "Ширина"},
+        {"StZapKalib", "Нач. ст. заполнения калибра"},
+        {"Rscrug", "Радиус скругления"},
+        {"KoefVit", "Коэффициент вытяжки"},
+        {"MarkSt", "Марка стали"},
+        {"Temp", "Температура раската"},
+        {"Diam", "Кон. диаметр изделия"},
+        {"NachDVal", "Нач диаметр валков"},
+        {"A1", "A1"},
+        {"StZapKalib1", "Кон. ст. заполнения калибра"}
+    };
+
+    public override Dictionary<string, string> OutputLabels => new Dictionary<string, string>
+    {
+        {"Result1", "Результат 1"},
+        {"Result2", "Результат 2"},
+        {"Result3", "Результат 3"},
+
+    };
+
+    public override double[] Calculate(double[] inputs)
+    {
+        return CalculationModule.CalculateSquareRhombus(inputs);
     }
 }

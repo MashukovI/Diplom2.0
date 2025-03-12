@@ -10,3 +10,15 @@ D:\Diplom\TEST\Test\obj\Debug\Test.pdb
 D:\Diplom\TEST\Test\bin\Debug\Newtonsoft.Json.dll
 D:\Diplom\TEST\Test\bin\Debug\Newtonsoft.Json.xml
 D:\Diplom\TEST\Test\obj\Debug\Test.csproj.Up2Date
+D:\Diplom\TEST\Test\Diplom2.0\bin\Debug\Test.exe.config
+D:\Diplom\TEST\Test\Diplom2.0\bin\Debug\Test.exe
+D:\Diplom\TEST\Test\Diplom2.0\bin\Debug\Test.pdb
+D:\Diplom\TEST\Test\Diplom2.0\bin\Debug\Newtonsoft.Json.dll
+D:\Diplom\TEST\Test\Diplom2.0\bin\Debug\Newtonsoft.Json.xml
+D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.csproj.AssemblyReference.cache
+D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.Properties.Resources.resources
+D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.csproj.GenerateResource.cache
+D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.csproj.CoreCompileInputs.cache
+D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.csproj.Up2Date
+D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.exe
+D:\Diplom\TEST\Test\Diplom2.0\obj\Debug\Test.pdb

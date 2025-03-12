@@ -12,47 +12,46 @@ public class OperationHistoryForm : Form
     private Button loadButton;
     private Button editButton;
     private Button deleteButton;
-    private ComboBox comboBoxOperationType; // ComboBox для выбора OperationType
+    private ComboBox comboBoxOperationType;
 
     private readonly DatabaseService _databaseService;
 
     // Словарь для хранения параметров каждого режима
     private readonly Dictionary<string, string[]> _modeParameters = new Dictionary<string, string[]>
-{
-    
-    { "Квадрат-Овал", new[] { "Width0", "StZapKalib", "Rscrug", "KoefVit", "Result1", "Result2" } },
-    { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "Temp", "Result1", "Result3" } },
-    { "Шестиугольник-Квадрат", new[] { "Width0", "MarkSt", "NachDVal", "Result1" } }
-};
+    {
+        { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "Temp", "KoefVit", "MarkSt", "NachDVal", "Diam", "A1", "StZapKalib1", "Result1", "Result2", "Result3" } },
+        { "Квадрат-Овал", new[] { "Width0", "StZapKalib", "Rscrug", "KoefVit", "Result1", "Result2" } },
+        { "Шестиугольник-Квадрат", new[] { "Width0", "MarkSt", "NachDVal", "Result1" } }
+    };
 
     public OperationHistoryForm(DatabaseService databaseService)
     {
         _databaseService = databaseService;
         InitializeForm();
-        LoadOperationTypes(); // Загружаем типы операций в ComboBox
-        LoadData("Квадрат-Овал"); // Загружаем данные для режима "Квадрат-Овал" при открытии формы
+        LoadOperationTypes();
+        LoadData("Квадрат-Ромб");
     }
 
     private void InitializeForm()
     {
         this.Text = "Operation History";
-        this.Size = new Size(800, 500);
+        this.Size = new Size(1000, 600);
 
         // ComboBox для выбора OperationType
         comboBoxOperationType = new ComboBox
         {
             Location = new Point(10, 10),
             Size = new Size(200, 30),
-            DropDownStyle = ComboBoxStyle.DropDownList // Запрещаем ручной ввод
+            DropDownStyle = ComboBoxStyle.DropDownList
         };
-        comboBoxOperationType.SelectedIndexChanged += ComboBoxOperationType_SelectedIndexChanged; // Обработчик события
+        comboBoxOperationType.SelectedIndexChanged += ComboBoxOperationType_SelectedIndexChanged;
         this.Controls.Add(comboBoxOperationType);
 
         // DataGridView
         historyDataGridView = new DataGridView
         {
             Location = new Point(10, 50),
-            Size = new Size(760, 360),
+            Size = new Size(960, 400),
             Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
             ReadOnly = true,
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
@@ -79,20 +78,17 @@ public class OperationHistoryForm : Form
     private void LoadOperationTypes()
     {
         try
+
         {
-            string query = "SELECT DISTINCT OperationType FROM OperationHistory"; // Уникальные типы операций
+            string query = "SELECT DISTINCT OperationType FROM OperationHistory";
             DataTable dt = _databaseService.ExecuteQuery(query);
 
-            // Очищаем ComboBox
             comboBoxOperationType.Items.Clear();
-
-            // Добавляем типы операций в ComboBox
             foreach (DataRow row in dt.Rows)
             {
                 comboBoxOperationType.Items.Add(row["OperationType"].ToString());
             }
 
-            // Выбираем первый элемент по умолчанию
             comboBoxOperationType.SelectedIndex = 0;
         }
         catch (Exception ex)
@@ -104,58 +100,50 @@ public class OperationHistoryForm : Form
     private void ComboBoxOperationType_SelectedIndexChanged(object sender, EventArgs e)
     {
         string selectedOperationType = comboBoxOperationType.SelectedItem?.ToString();
-
-        // Загружаем данные для выбранного типа операции
         LoadData(selectedOperationType);
     }
 
-    private void LoadData(string mode = "Квадрат-Овал")
+    private void LoadData(string mode = "Квадрат-Ромб")
     {
         try
         {
-            // Проверяем, что режим существует в словаре
             if (!_modeParameters.ContainsKey(mode))
             {
                 MessageBox.Show($"Режим '{mode}' не найден в списке параметров.");
                 return;
             }
 
-            // SQL-запрос для получения данных
             string query = @"
-            SELECT 
-                oh.Id,
-                oh.OperationType,
-                oh.InputParameters,
-                oh.OutputParameters,
-                oh.CalculationDate,
-                u.Username AS UserName
-            FROM OperationHistory oh
-            LEFT JOIN Users u ON oh.UserId = u.UserId
-            WHERE 
-                (@IsTeacher = 1 AND u.GroupId IN 
-                    (SELECT GroupId FROM Groups WHERE TeacherId = @TeacherId))
-                OR (@IsTeacher = 0 AND oh.UserId = @UserId)
-                AND (@OperationType IS NULL OR oh.OperationType = @OperationType)";
+                SELECT 
+                    oh.Id,
+                    oh.OperationType,
+                    oh.InputParameters,
+                    oh.OutputParameters,
+                    oh.CalculationDate,
+                    u.Username AS UserName
+                FROM OperationHistory oh
+                LEFT JOIN Users u ON oh.UserId = u.UserId
+                WHERE 
+                    oh.OperationType = @OperationType
+                    AND (
+                        (@IsTeacher = 1 AND u.GroupId IN 
+                            (SELECT GroupId FROM Groups WHERE TeacherId = @TeacherId))
+                        OR (@IsTeacher = 0 AND oh.UserId = @UserId)
+                    )";
 
             SqlParameter[] parameters = {
-            new SqlParameter("@IsTeacher", LoginForm.CurrentUserRole == "Teacher" ? 1 : 0),
-            new SqlParameter("@TeacherId", LoginForm.CurrentUserId),
-            new SqlParameter("@UserId", LoginForm.CurrentUserId),
-            new SqlParameter("@OperationType", (object)mode ?? DBNull.Value)  // Фильтр по OperationType
-        };
+                new SqlParameter("@IsTeacher", LoginForm.CurrentUserRole == "Teacher" ? 1 : 0),
+                new SqlParameter("@TeacherId", LoginForm.CurrentUserId),
+                new SqlParameter("@UserId", LoginForm.CurrentUserId),
+                new SqlParameter("@OperationType", mode)
+            };
 
             DataTable dt = _databaseService.ExecuteQuery(query, parameters);
-
-            // Настраиваем колонки в зависимости от режима
             ConfigureGridColumns(mode);
-
-            // Очищаем строки DataGridView
             historyDataGridView.Rows.Clear();
 
-            // Перебираем строки DataTable
             foreach (DataRow row in dt.Rows)
             {
-                // Проверяем InputParameters
                 Dictionary<string, double> inputParameters = null;
                 if (!string.IsNullOrEmpty(row["InputParameters"].ToString()))
                 {
@@ -170,7 +158,6 @@ public class OperationHistoryForm : Form
                     }
                 }
 
-                // Проверяем OutputParameters
                 double[] outputParameters = null;
                 if (!string.IsNullOrEmpty(row["OutputParameters"].ToString()))
                 {
@@ -185,21 +172,17 @@ public class OperationHistoryForm : Form
                     }
                 }
 
-                // Создаем список значений для строки
                 var rowValues = new List<object>
-            {
-                row["Id"],
-                row["CalculationDate"],
-                row["OperationType"]
-            };
+                {
+                    row["Id"],
+                    row["CalculationDate"]
+                };
 
-                // Добавляем столбец Username, если пользователь — преподаватель
                 if (LoginForm.CurrentUserRole == "Teacher")
                 {
                     rowValues.Add(row["UserName"]);
                 }
 
-                // Добавляем значения параметров в зависимости от режима
                 foreach (var parameter in _modeParameters[mode])
                 {
                     if (inputParameters != null && inputParameters.TryGetValue(parameter, out double value))
@@ -213,11 +196,10 @@ public class OperationHistoryForm : Form
                     }
                     else
                     {
-                        rowValues.Add(0); // Значение по умолчанию
+                        rowValues.Add(0);
                     }
                 }
 
-                // Добавляем строку в DataGridView
                 historyDataGridView.Rows.Add(rowValues.ToArray());
             }
         }
@@ -229,22 +211,17 @@ public class OperationHistoryForm : Form
 
     private void ConfigureGridColumns(string mode)
     {
-        // Очищаем существующие колонки
         historyDataGridView.Columns.Clear();
 
-        // Добавляем общие колонки
         historyDataGridView.Columns.Add("Id", "ID");
         historyDataGridView.Columns.Add("CalculationDate", "Дата расчета");
-        historyDataGridView.Columns.Add("OperationType", "Тип операции");
 
-        // Добавляем столбец Username, если пользователь — преподаватель
         if (LoginForm.CurrentUserRole == "Teacher")
         {
             historyDataGridView.Columns.Add("UserName", "Пользователь");
         }
 
-        // Добавляем колонки для входных и выходных параметров в зависимости от режима
-        if (!string.IsNullOrEmpty(mode) && _modeParameters.ContainsKey(mode))
+        if (_modeParameters.ContainsKey(mode))
         {
             foreach (var parameter in _modeParameters[mode])
             {
@@ -252,7 +229,6 @@ public class OperationHistoryForm : Form
             }
         }
 
-        // Скрываем столбец "Id"
         historyDataGridView.Columns["Id"].Visible = false;
     }
 
@@ -286,14 +262,14 @@ public class OperationHistoryForm : Form
     {
         if (historyDataGridView.SelectedRows.Count == 0)
         {
-            MessageBox.Show("Please select a record to delete.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Выберите запись для удаления.", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
         var selectedRow = historyDataGridView.SelectedRows[0];
         int id = (int)selectedRow.Cells["Id"].Value;
 
-        if (MessageBox.Show("Are you sure you want to delete this record?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+        if (MessageBox.Show("Вы уверены, что хотите удалить эту запись?", "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
         {
             string query = "DELETE FROM OperationHistory WHERE Id = @Id";
             SqlParameter[] parameters = { new SqlParameter("@Id", id) };
@@ -301,12 +277,12 @@ public class OperationHistoryForm : Form
             try
             {
                 _databaseService.ExecuteNonQuery(query, parameters);
-                MessageBox.Show("Record deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                LoadData(); // Обновляем данные после удаления
+                MessageBox.Show("Запись успешно удалена.", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadData();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error deleting record: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка удаления записи: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

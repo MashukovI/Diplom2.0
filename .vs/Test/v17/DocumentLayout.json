@@ -1,42 +1,46 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Diplom\\TEST\\Test\\",
+  "WorkspaceRootPath": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\operationhistoryform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:operationhistoryform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\editcalculationform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:editcalculationform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\studentcalculatorform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|d:\\diplom\\test\\test\\diplom2.0\\studentcalculatorform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:studentcalculatorform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|d:\\diplom\\test\\test\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|d:\\diplom\\test\\test\\diplom2.0\\calculationmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:calculationmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\Diplom2.0\\operationhistoryform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:operationhistoryform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\groupmanagementform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:groupmanagementform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\Diplom2.0\\editcalculationform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:editcalculationform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\databaseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\Diplom2.0\\databaseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:databaseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\teachermainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:teachermainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\Diplom2.0\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\Diplom2.0\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\Diplom2.0\\groupmanagementform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:groupmanagementform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|d:\\diplom\\test\\test\\diplom2.0\\registrationform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:registrationform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|D:\\Diplom\\TEST\\Test\\Diplom2.0\\teachermainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{264211D5-1825-4EBA-BEB8-603F8823259C}|Test.csproj|solutionrelative:teachermainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,7 +50,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -59,116 +63,129 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "CalculationModule.cs",
+              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\CalculationModule.cs",
+              "RelativeDocumentMoniker": "CalculationModule.cs",
+              "ToolTip": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\CalculationModule.cs",
+              "RelativeToolTip": "CalculationModule.cs",
+              "ViewState": "AgIAAEQAAAAAAAAAAAAQwF0AAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-12T04:16:27.93Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "EditCalculationForm.cs",
-              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\EditCalculationForm.cs",
+              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\EditCalculationForm.cs",
               "RelativeDocumentMoniker": "EditCalculationForm.cs",
-              "ToolTip": "D:\\Diplom\\TEST\\Test\\EditCalculationForm.cs",
+              "ToolTip": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\EditCalculationForm.cs",
               "RelativeToolTip": "EditCalculationForm.cs",
-              "ViewState": "AgIAAHUAAAAAAAAAAAAwwJwAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAI0AAAAAAAAAAAAgwPYAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-10T03:30:54.893Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "OperationHistoryForm.cs",
-              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\OperationHistoryForm.cs",
+              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\OperationHistoryForm.cs",
               "RelativeDocumentMoniker": "OperationHistoryForm.cs",
-              "ToolTip": "D:\\Diplom\\TEST\\Test\\OperationHistoryForm.cs",
+              "ToolTip": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\OperationHistoryForm.cs",
               "RelativeToolTip": "OperationHistoryForm.cs",
-              "ViewState": "AgIAAEMAAAAAAAAAAAAAAEwAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAQwBUAAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-10T01:57:38.654Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "StudentCalculatorForm.cs",
-              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\StudentCalculatorForm.cs",
+              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\StudentCalculatorForm.cs",
               "RelativeDocumentMoniker": "StudentCalculatorForm.cs",
-              "ToolTip": "D:\\Diplom\\TEST\\Test\\StudentCalculatorForm.cs",
+              "ToolTip": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\StudentCalculatorForm.cs",
               "RelativeToolTip": "StudentCalculatorForm.cs",
-              "ViewState": "AgIAAEkAAAAAAAAAAADwv9sAAAAwAAAAAAAAAA==",
+              "ViewState": "AgIAAMwAAAAAAAAAAAAQwNsAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-10T02:09:37.019Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 9,
               "Title": "TeacherMainForm.cs",
-              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\TeacherMainForm.cs",
+              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\TeacherMainForm.cs",
               "RelativeDocumentMoniker": "TeacherMainForm.cs",
-              "ToolTip": "D:\\Diplom\\TEST\\Test\\TeacherMainForm.cs",
+              "ToolTip": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\TeacherMainForm.cs",
               "RelativeToolTip": "TeacherMainForm.cs",
-              "ViewState": "AgIAACwAAAAAAAAAAAApwEMAAAASAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAD4AAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-10T01:14:32.929Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Class1.cs",
-              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Class1.cs",
-              "RelativeDocumentMoniker": "Class1.cs",
-              "ToolTip": "D:\\Diplom\\TEST\\Test\\Class1.cs",
-              "RelativeToolTip": "Class1.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAUAAAAAAAAAA==",
+              "DocumentIndex": 8,
+              "Title": "RegistrationForm.cs",
+              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\RegistrationForm.cs",
+              "RelativeDocumentMoniker": "RegistrationForm.cs",
+              "ToolTip": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\RegistrationForm.cs",
+              "RelativeToolTip": "RegistrationForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-10T01:44:30.731Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "GroupManagementForm.cs",
-              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\GroupManagementForm.cs",
+              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\GroupManagementForm.cs",
               "RelativeDocumentMoniker": "GroupManagementForm.cs",
-              "ToolTip": "D:\\Diplom\\TEST\\Test\\GroupManagementForm.cs",
+              "ToolTip": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\GroupManagementForm.cs",
               "RelativeToolTip": "GroupManagementForm.cs",
-              "ViewState": "AgIAAGcAAAAAAAAAAADwv30AAAAaAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAH0AAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-10T01:16:08.489Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 4,
               "Title": "DatabaseService.cs",
-              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\DatabaseService.cs",
+              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\DatabaseService.cs",
               "RelativeDocumentMoniker": "DatabaseService.cs",
-              "ToolTip": "D:\\Diplom\\TEST\\Test\\DatabaseService.cs",
+              "ToolTip": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\DatabaseService.cs",
               "RelativeToolTip": "DatabaseService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAAAYAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-10T00:42:05.782Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 6,
               "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Program.cs",
+              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "D:\\Diplom\\TEST\\Test\\Program.cs",
+              "ToolTip": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAEAAAAAAAAAAABBwBEAAABFAAAAAAAAAA==",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABEAAABFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-10T00:45:37.109Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "LoginForm.cs",
-              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\LoginForm.cs",
+              "DocumentMoniker": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\LoginForm.cs",
               "RelativeDocumentMoniker": "LoginForm.cs",
-              "ToolTip": "D:\\Diplom\\TEST\\Test\\LoginForm.cs",
+              "ToolTip": "D:\\Diplom\\TEST\\Test\\Diplom2.0\\LoginForm.cs",
               "RelativeToolTip": "LoginForm.cs",
-              "ViewState": "AgIAAHcAAAAAAAAAAADwv4sAAAAfAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIsAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-10T01:16:10.939Z",
               "EditorCaption": ""

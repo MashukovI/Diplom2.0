@@ -59,7 +59,7 @@ public class TeacherMainForm : Form
 
         // Настройка формы
         this.Text = "Teacher Main Form";
-        this.Size = new System.Drawing.Size(500, 100);
+        this.Size = new System.Drawing.Size(500, 300);
     }
 
     private void LogoutButton_Click(object sender, EventArgs e)
