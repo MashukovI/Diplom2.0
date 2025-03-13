@@ -9,8 +9,8 @@ using Newtonsoft.Json;
 
 public class EditCalculationForm : Form
 {
-    private TextBox txtWidth0, txtStZapKalib, txtRscrug, txtKoefVit,
-                  txtMarkSt, txtTemp, txtNachDVal, txtA1, txtStZapKalib1,
+    private TextBox txtWidth0, txtStZapKalib, txtRscrug, txtKoefVit, txtSquare0, txtHeight1, txtBvr,
+                  txtMarkSt, txtTemp, txtNachDVal, txtA1, txtStZapKalib1, txtBk, txtrscrug,
                   txtResult1, txtResult2, txtResult3, txtResult4, txtResult5, txtResult6;
     private Button btnSave;
     private int _calculationId;
@@ -20,7 +20,7 @@ public class EditCalculationForm : Form
     // Словарь для хранения параметров каждого режима
     private readonly Dictionary<string, string[]> _modeParameters = new Dictionary<string, string[]>
     {
-        { "Квадрат-Овал", new[] { "Width0", "StZapKalib", "Rscrug", "KoefVit", "Temp" } },
+        { "Квадрат-Овал", new[] { "Width0", "Square0", "Height1", "Bvr", "Bk", "rscrug", "NachDVal", "MarkSt", "Temp" } },
         { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "KoefVit", "MarkSt", "Temp", "NachDVal", "A1", "StZapKalib1" } },
         { "Шестиугольник-Квадрат", new[] { "Width0", "MarkSt", "NachDVal" } }
     };
@@ -28,15 +28,23 @@ public class EditCalculationForm : Form
     // Словарь для отображения пользовательских названий
     private readonly Dictionary<string, string> _parameterDisplayNames = new Dictionary<string, string>
     {
-        {"Width0", "Ширина"},
         {"StZapKalib", "Нач. ст. заполнения калибра"},
         {"Rscrug", "Радиус скругления"},
         {"KoefVit", "Коэффициент вытяжки"},
         {"MarkSt", "Марка стали"},
         {"Temp", "Температура раската"},
         {"NachDVal", "Нач диаметр валков"},
-        {"A1", "A1"},
-        {"StZapKalib1", "Кон. ст. заполнения калибра"}
+        {"A1", "Отношение нач. диаметра к расч. высоте"},
+        {"StZapKalib1", "Кон. ст. заполнения калибра"},
+        {"Width0", "Ширина квадратой формы"},
+        {"Square0", "Площадь раската"},
+        {"Height1", "Высота овальной формы"},
+        {"Bvr", "Ширена овальной формы"},
+        {"Bk", "Ширина калибра"},
+        {"rscrug", "Радиус скругления"},
+
+
+
     };
 
     public EditCalculationForm(DatabaseService databaseService, int calculationId)
@@ -54,6 +62,8 @@ public class EditCalculationForm : Form
 
         // Создаем и размещаем элементы
         int y = 10;
+
+        // Создаем текстовые поля для всех возможных параметров
         txtWidth0 = CreateLabeledTextBox("Width0:", ref y);
         txtStZapKalib = CreateLabeledTextBox("StZapKalib:", ref y);
         txtRscrug = CreateLabeledTextBox("Rscrug:", ref y);
@@ -61,9 +71,13 @@ public class EditCalculationForm : Form
         txtMarkSt = CreateLabeledTextBox("MarkSt:", ref y);
         txtTemp = CreateLabeledTextBox("Temp:", ref y);
         txtNachDVal = CreateLabeledTextBox("NachDVal:", ref y);
-
         txtA1 = CreateLabeledTextBox("A1:", ref y);
         txtStZapKalib1 = CreateLabeledTextBox("StZapKalib1:", ref y);
+        txtSquare0 = CreateLabeledTextBox("Square0:", ref y);
+        txtHeight1 = CreateLabeledTextBox("Height1:", ref y);
+        txtBvr = CreateLabeledTextBox("Bvr:", ref y);
+        txtBk = CreateLabeledTextBox("Bk:", ref y);
+        txtrscrug = CreateLabeledTextBox("rscrug:", ref y);
 
         // Поля результатов (заблокированы для редактирования)
         txtResult1 = CreateLabeledTextBox("Result1:", ref y);
@@ -146,87 +160,111 @@ public class EditCalculationForm : Form
     }
 
     private void ShowFieldsForMode(string mode, Dictionary<string, double> inputParameters, double[] outputParameters)
+{
+    // Скрываем все поля и лейблы
+    foreach (var control in this.Controls)
     {
-        // Скрываем все поля и лейблы
-        foreach (var control in this.Controls)
+        if (control is TextBox textBox && textBox != txtResult1 && textBox != txtResult2 && textBox != txtResult3 &&
+            textBox != txtResult4 && textBox != txtResult5 && textBox != txtResult6)
         {
-            if (control is TextBox textBox && textBox != txtResult1 && textBox != txtResult2 && textBox != txtResult3 &&
-                textBox != txtResult4 && textBox != txtResult5 && textBox != txtResult6)
-            {
-                textBox.Visible = false;
-            }
-            if (control is Label label && label.Text != "Result1:" && label.Text != "Result2:" && label.Text != "Result3:" &&
-                label.Text != "Result4:" && label.Text != "Result5:" && label.Text != "Result6:")
-            {
-                label.Visible = false;
-            }
+            textBox.Visible = false;
         }
-
-        // Показываем только те поля и лейблы, которые нужны для текущего режима
-        if (_modeParameters.ContainsKey(mode))
+        if (control is Label label && label.Text != "Result1:" && label.Text != "Result2:" && label.Text != "Result3:" &&
+            label.Text != "Result4:" && label.Text != "Result5:" && label.Text != "Result6:")
         {
-            foreach (var parameter in _modeParameters[mode])
-            {
-                switch (parameter)
-                {
-                    case "Width0":
-                        txtWidth0.Visible = true;
-                        txtWidth0.Text = inputParameters["Width0"].ToString();
-                        FindLabelByTextBox(txtWidth0).Visible = true; // Показываем лейбл
-                        break;
-                    case "StZapKalib":
-                        txtStZapKalib.Visible = true;
-                        txtStZapKalib.Text = inputParameters["StZapKalib"].ToString();
-                        FindLabelByTextBox(txtStZapKalib).Visible = true; // Показываем лейбл
-                        break;
-                    case "Rscrug":
-                        txtRscrug.Visible = true;
-                        txtRscrug.Text = inputParameters["Rscrug"].ToString();
-                        FindLabelByTextBox(txtRscrug).Visible = true; // Показываем лейбл
-                        break;
-                    case "KoefVit":
-                        txtKoefVit.Visible = true;
-                        txtKoefVit.Text = inputParameters["KoefVit"].ToString();
-                        FindLabelByTextBox(txtKoefVit).Visible = true; // Показываем лейбл
-                        break;
-                    case "MarkSt":
-                        txtMarkSt.Visible = true;
-                        txtMarkSt.Text = inputParameters["MarkSt"].ToString();
-                        FindLabelByTextBox(txtMarkSt).Visible = true; // Показываем лейбл
-                        break;
-                    case "Temp":
-                        txtTemp.Visible = true;
-                        txtTemp.Text = inputParameters["Temp"].ToString();
-                        FindLabelByTextBox(txtTemp).Visible = true; // Показываем лейбл
-                        break;
-                    case "NachDVal":
-                        txtNachDVal.Visible = true;
-                        txtNachDVal.Text = inputParameters["NachDVal"].ToString();
-                        FindLabelByTextBox(txtNachDVal).Visible = true; // Показываем лейбл
-                        break;
-
-                    case "A1":
-                        txtA1.Visible = true;
-                        txtA1.Text = inputParameters["A1"].ToString();
-                        FindLabelByTextBox(txtA1).Visible = true; // Показываем лейбл
-                        break;
-                    case "StZapKalib1":
-                        txtStZapKalib1.Visible = true;
-                        txtStZapKalib1.Text = inputParameters["StZapKalib1"].ToString();
-                        FindLabelByTextBox(txtStZapKalib1).Visible = true; // Показываем лейбл
-                        break;
-                }
-            }
+            label.Visible = false;
         }
-
-        // Отображаем результаты
-        txtResult1.Text = outputParameters.Length > 0 ? outputParameters[0].ToString("F2") : "0";
-        txtResult2.Text = outputParameters.Length > 1 ? outputParameters[1].ToString("F2") : "0";
-        txtResult3.Text = outputParameters.Length > 2 ? outputParameters[2].ToString("F2") : "0";
-        txtResult4.Text = outputParameters.Length > 3 ? outputParameters[3].ToString("F2") : "0";
-        txtResult5.Text = outputParameters.Length > 4 ? outputParameters[4].ToString("F2") : "0";
-        txtResult6.Text = outputParameters.Length > 5 ? outputParameters[5].ToString("F2") : "0";
     }
+
+    // Показываем только те поля и лейблы, которые нужны для текущего режима
+    if (_modeParameters.ContainsKey(mode))
+    {
+        foreach (var parameter in _modeParameters[mode])
+        {
+            switch (parameter)
+            {
+                case "Width0":
+                    txtWidth0.Visible = true;
+                    txtWidth0.Text = inputParameters["Width0"].ToString();
+                    FindLabelByTextBox(txtWidth0).Visible = true; // Показываем лейбл
+                    break;
+                case "StZapKalib":
+                    txtStZapKalib.Visible = true;
+                    txtStZapKalib.Text = inputParameters["StZapKalib"].ToString();
+                    FindLabelByTextBox(txtStZapKalib).Visible = true; // Показываем лейбл
+                    break;
+                case "Rscrug":
+                    txtRscrug.Visible = true;
+                    txtRscrug.Text = inputParameters["Rscrug"].ToString();
+                    FindLabelByTextBox(txtRscrug).Visible = true; // Показываем лейбл
+                    break;
+                case "KoefVit":
+                    txtKoefVit.Visible = true;
+                    txtKoefVit.Text = inputParameters["KoefVit"].ToString();
+                    FindLabelByTextBox(txtKoefVit).Visible = true; // Показываем лейбл
+                    break;
+                case "MarkSt":
+                    txtMarkSt.Visible = true;
+                    txtMarkSt.Text = inputParameters["MarkSt"].ToString();
+                    FindLabelByTextBox(txtMarkSt).Visible = true; // Показываем лейбл
+                    break;
+                case "Temp":
+                    txtTemp.Visible = true;
+                    txtTemp.Text = inputParameters["Temp"].ToString();
+                    FindLabelByTextBox(txtTemp).Visible = true; // Показываем лейбл
+                    break;
+                case "NachDVal":
+                    txtNachDVal.Visible = true;
+                    txtNachDVal.Text = inputParameters["NachDVal"].ToString();
+                    FindLabelByTextBox(txtNachDVal).Visible = true; // Показываем лейбл
+                    break;
+                case "A1":
+                    txtA1.Visible = true;
+                    txtA1.Text = inputParameters["A1"].ToString();
+                    FindLabelByTextBox(txtA1).Visible = true; // Показываем лейбл
+                    break;
+                case "StZapKalib1":
+                    txtStZapKalib1.Visible = true;
+                    txtStZapKalib1.Text = inputParameters["StZapKalib1"].ToString();
+                    FindLabelByTextBox(txtStZapKalib1).Visible = true; // Показываем лейбл
+                    break;
+                case "Square0":
+                    txtSquare0.Visible = true;
+                    txtSquare0.Text = inputParameters["Square0"].ToString();
+                    FindLabelByTextBox(txtSquare0).Visible = true; // Показываем лейбл
+                    break;
+                case "Height1":
+                    txtHeight1.Visible = true;
+                    txtHeight1.Text = inputParameters["Height1"].ToString();
+                    FindLabelByTextBox(txtHeight1).Visible = true; // Показываем лейбл
+                    break;
+                case "Bvr":
+                    txtBvr.Visible = true;
+                    txtBvr.Text = inputParameters["Bvr"].ToString();
+                    FindLabelByTextBox(txtBvr).Visible = true; // Показываем лейбл
+                    break;
+                case "Bk":
+                    txtBk.Visible = true;
+                    txtBk.Text = inputParameters["Bk"].ToString();
+                    FindLabelByTextBox(txtBk).Visible = true; // Показываем лейбл
+                    break;
+                case "rscrug":
+                    txtrscrug.Visible = true;
+                    txtrscrug.Text = inputParameters["rscrug"].ToString();
+                    FindLabelByTextBox(txtrscrug).Visible = true; // Показываем лейбл
+                    break;
+            }
+        }
+    }
+
+    // Отображаем результаты
+    txtResult1.Text = outputParameters.Length > 0 ? outputParameters[0].ToString("F2") : "0";
+    txtResult2.Text = outputParameters.Length > 1 ? outputParameters[1].ToString("F2") : "0";
+    txtResult3.Text = outputParameters.Length > 2 ? outputParameters[2].ToString("F2") : "0";
+    txtResult4.Text = outputParameters.Length > 3 ? outputParameters[3].ToString("F2") : "0";
+    txtResult5.Text = outputParameters.Length > 4 ? outputParameters[4].ToString("F2") : "0";
+    txtResult6.Text = outputParameters.Length > 5 ? outputParameters[5].ToString("F2") : "0";
+}
 
     // Вспомогательный метод для поиска лейбла по связанному TextBox
     private Label FindLabelByTextBox(TextBox textBox)

@@ -1,8 +1,10 @@
 ﻿using System.Windows.Forms;
 using System;
+using System.Drawing;
 
 public class TeacherMainForm : Form
 {
+    private Label userNameLabel;
     public static int CurrentUserId { get; set; }
     public static string CurrentUserRole { get; set; }
     public static int CurrentUserGroupId { get; set; }
@@ -21,6 +23,15 @@ public class TeacherMainForm : Form
 
     private void InitializeForm()
     {
+        userNameLabel = new Label
+        {
+            Location = new Point(10, 100), // Позиция на форме
+            AutoSize = true, // Автоматический размер
+            Font = new Font("Times New Roman", 12, FontStyle.Bold), // Шрифт
+            ForeColor = Color.Black, // Цвет текста
+            Text = $"Пользователь: {LoginForm.CurrentUserName}" // Текст с именем пользователя
+        };
+        this.Controls.Add(userNameLabel);
         this.manageGroupsButton = new Button();
         this.viewHistoryButton = new Button();
         this.calculatorButton = new Button();
@@ -59,7 +70,7 @@ public class TeacherMainForm : Form
 
         // Настройка формы
         this.Text = "Teacher Main Form";
-        this.Size = new System.Drawing.Size(500, 300);
+        this.Size = new System.Drawing.Size(500, 180);
     }
 
     private void LogoutButton_Click(object sender, EventArgs e)

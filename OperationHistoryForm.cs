@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 
@@ -19,21 +20,45 @@ public class OperationHistoryForm : Form
     // Словарь для хранения параметров каждого режима
     private readonly Dictionary<string, string[]> _modeParameters = new Dictionary<string, string[]>
     {
-        { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "Temp", "KoefVit", "MarkSt", "NachDVal", "A1", "StZapKalib1", "Result1", "Result2", "Result3" } },
-        { "Квадрат-Овал", new[] { "Width0", "StZapKalib", "Rscrug", "KoefVit", "Result1", "Result2" } },
+        { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "Temp", "KoefVit", "MarkSt", "NachDVal", "A1", "StZapKalib1", "Result1", "Result2", "Result3", "Result4", "Result5", "Result6" } },
+        { "Квадрат-Овал", new[] { "Width0", "Square0", "Height1", "Bvr", "Bk", "rscrug", "NachDVal", "MarkSt", "Temp", "Result1", "Result2", "Result3", } },
         { "Шестиугольник-Квадрат", new[] { "Width0", "MarkSt", "NachDVal", "Result1" } }
     };
-    private readonly Dictionary<string, string> _parameterDisplayNames = new Dictionary<string, string>
+    private readonly Dictionary<string, string> _parameterDisplayNamesKvOv = new Dictionary<string, string>
 {
+
+        {"Width0", "Ширина квадратой формы"},
+        {"Square0", "Площадь раската"},
+        {"Height1", "Высота овальной формы"},
+        {"Bvr", "Ширена овальной формы"},
+        {"Bk", "Ширина калибра"},
+        {"rscrug", "Радиус скругления"},
+        {"NachDVal", "Нач диаметр валков."},
+        {"MarkSt", "Марка стали"},
+        {"Temp", "Температура раската"},
+        {"Result1", "Высота раската" },
+        {"Result2", "Ширина калибра" },
+        {"Result3", "Коэффициент вытяжки" },
+
+};
+    private readonly Dictionary<string, string> _parameterDisplayNamesKvRo = new Dictionary<string, string>
+{
+
         {"Width0", "Ширина"},
         {"StZapKalib", "Нач. ст. заполнения калибра"},
         {"Rscrug", "Радиус скругления"},
         {"KoefVit", "Коэффициент вытяжки"},
         {"MarkSt", "Марка стали"},
         {"Temp", "Температура раската"},
-        {"NachDVal", "Нач диаметр валков"},
-        {"A1", "A1"},
-        {"StZapKalib1", "Кон. ст. заполнения калибра"}
+        {"NachDVal", "Нач. диаметр валков"},
+        {"A1", "Отношение D0/H1"},
+        {"StZapKalib1", "Кон. ст. заполнения калибра"},
+        {"Result1", "Высота раската" },
+        {"Result2", "Ширина калибра" },
+        {"Result3", "Ширина раската" },
+        {"Result4", "Коэф. уширения" },
+        {"Result5", "Разница теор. и прак." },
+        {"Result6", "Ширина выреза ручья" }
 };
     public OperationHistoryForm(DatabaseService databaseService)
     {
@@ -84,6 +109,30 @@ public class OperationHistoryForm : Form
         deleteButton = new Button { Location = new Point(440, 10), Size = new Size(100, 30), Text = "Delete" };
         deleteButton.Click += DeleteButton_Click;
         this.Controls.Add(deleteButton);
+    }
+
+
+    private string GenerateHistoryPrintText()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.AppendLine("История операций:");
+        sb.AppendLine();
+
+        // Получаем данные из DataGridView
+        foreach (DataGridViewRow row in historyDataGridView.Rows)
+        {
+            if (!row.IsNewRow)
+            {
+                for (int i = 0; i < row.Cells.Count; i++)
+                {
+                    sb.Append($"{historyDataGridView.Columns[i].HeaderText}: {row.Cells[i].Value} | ");
+                }
+                sb.AppendLine();
+            }
+        }
+
+        return sb.ToString();
     }
 
     private void LoadOperationTypes()
@@ -198,12 +247,13 @@ public class OperationHistoryForm : Form
                 {
                     if (inputParameters != null && inputParameters.TryGetValue(parameter, out double value))
                     {
-                        rowValues.Add(value);
+                        rowValues.Add(Math.Round(value, 2)); // Округление до 2 знаков
                     }
                     else if (outputParameters != null && parameter.StartsWith("Result"))
                     {
                         int index = int.Parse(parameter.Replace("Result", "")) - 1;
-                        rowValues.Add(outputParameters.Length > index ? outputParameters[index] : 0);
+                        double resultValue = outputParameters.Length > index ? outputParameters[index] : 0;
+                        rowValues.Add(Math.Round(resultValue, 2)); // Округление до 2 знаков
                     }
                     else
                     {
@@ -239,9 +289,10 @@ public class OperationHistoryForm : Form
             foreach (var parameter in _modeParameters[mode])
             {
                 // Используем словарь для получения пользовательского названия
-                string displayName = _parameterDisplayNames.ContainsKey(parameter)
-                    ? _parameterDisplayNames[parameter]
+                string displayName = _parameterDisplayNamesKvRo.ContainsKey(parameter)
+                    ? _parameterDisplayNamesKvRo[parameter]
                     : parameter;
+
 
                 historyDataGridView.Columns.Add(parameter, displayName);
             }
