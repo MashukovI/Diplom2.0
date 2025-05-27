@@ -35,11 +35,11 @@ public class StudentCalculatorForm : Form
 
         Vicheslen = new Label
         {
-            Location = new Point(10, 430), // Позиция на форме
+            Location = new Point(10, 320), // Позиция на форме
             AutoSize = true, // Автоматический размер
             Font = new Font("Times New Roman", 12, FontStyle.Bold), // Шрифт
             ForeColor = Color.Black, // Цвет текста
-            Text = "Все вычисления проводятся в миллиметрах и градусах цельсия" // Текст с именем пользователя
+            Text = "Все значения приводятся в миллиметрах и градусах цельсия" // Текст с именем пользователя
         };
         this.Controls.Add(Vicheslen);
         userNameLabel = new Label
@@ -165,6 +165,10 @@ public class StudentCalculatorForm : Form
     {
         modeComboBox.Items.Add(new SquareRhombusMode());
         modeComboBox.Items.Add(new SquareOvalMode());
+        modeComboBox.Items.Add(new HexagonSquareMode());
+        modeComboBox.Items.Add(new OvalSquareMode());
+        modeComboBox.Items.Add(new OvalCircleMode());
+        modeComboBox.Items.Add(new FlatOvalCircleMode());
         modeComboBox.DisplayMember = "ModeName";
         modeComboBox.SelectedIndex = 0;
     }
@@ -263,9 +267,8 @@ public class StudentCalculatorForm : Form
                 SetTextBoxValue("Rscrug", "3");
                 SetTextBoxValue("KoefVit", "1,35");
                 SetTextBoxValue("MarkSt", "45");
-                SetTextBoxValue("Temp", "1000");
+                SetTextBoxValue("Temp", "1100");
                 SetTextBoxValue("NachDVal", "300");
-                SetTextBoxValue("A1", "2");
                 SetTextBoxValue("StZapKalib1", "0,85");
                 break;
 
@@ -285,6 +288,17 @@ public class StudentCalculatorForm : Form
                 SetTextBoxValue("Width0", "20");
                 SetTextBoxValue("MarkSt", "45");
                 SetTextBoxValue("NachDVal", "300");
+                break;
+
+            case "Плоский овал-Круг":
+                SetTextBoxValue("Width0", "20");
+                SetTextBoxValue("StZapKalib", "0,9");
+                SetTextBoxValue("Rscrug", "3");
+                SetTextBoxValue("KoefVit", "1,35");
+                SetTextBoxValue("MarkSt", "45");
+                SetTextBoxValue("Temp", "1100");
+                SetTextBoxValue("NachDVal", "300");
+                SetTextBoxValue("StZapKalib1", "0,85");
                 break;
         }
     }
@@ -452,6 +466,42 @@ public class SquareRhombusMode : CalculationMode
         {"MarkSt", "Марка стали"},
         {"Temp", "Температура раската"},
         {"NachDVal", "Нач диаметр валков"},
+        
+        {"StZapKalib1", "Кон. ст. заполнения калибра"}
+    };
+
+    public override Dictionary<string, string> OutputLabels => new Dictionary<string, string>
+    {
+        {"Result1", "Высота раската" },
+        {"Result2", "Ширина калибра" },
+        {"Result3", "Ширина раската" },
+        {"Result4", "Коэф. уширения" },
+        {"Result5", "Разница значений" },
+        {"Result6", "Ширина выреза ручья" },
+        {"A1", "Отношение нач. диаметра к расч. высоте"}
+    };
+
+    public override double[] Calculate(double[] inputs)
+    {
+        return CalculationModule.CalculateSquareRhombus(inputs);
+    }
+
+    public override string ImagePath => "Images/square_rhombus.PNG"; // Путь к изображению для режима
+}
+
+public class HexagonSquareMode : CalculationMode
+{
+    public override string ModeName => "Шестиугольник-Квадрат";
+
+    public override Dictionary<string, string> InputLabels => new Dictionary<string, string>
+    {
+        {"Width0", "Ширина"},
+        {"StZapKalib", "Нач. ст. заполнения калибра"},
+        {"Rscrug", "Радиус скругления"},
+        {"KoefVit", "Коэффициент вытяжки"},
+        {"MarkSt", "Марка стали"},
+        {"Temp", "Температура раската"},
+        {"NachDVal", "Нач диаметр валков"},
         {"A1", "Отношение нач. диаметра к расч. высоте"},
         {"StZapKalib1", "Кон. ст. заполнения калибра"}
     };
@@ -468,7 +518,114 @@ public class SquareRhombusMode : CalculationMode
 
     public override double[] Calculate(double[] inputs)
     {
-        return CalculationModule.CalculateSquareRhombus(inputs);
+        return CalculationModule.CalculateHexagonSquare(inputs);
+    }
+
+    public override string ImagePath => "Images/square_rhombus.PNG"; // Путь к изображению для режима
+}
+
+public class OvalSquareMode : CalculationMode
+{
+    public override string ModeName => "Овал-Квадрат";
+
+    public override Dictionary<string, string> InputLabels => new Dictionary<string, string>
+    {
+        {"Width0", "Ширина"},
+        {"StZapKalib", "Нач. ст. заполнения калибра"},
+        {"Rscrug", "Радиус скругления"},
+        {"KoefVit", "Коэффициент вытяжки"},
+        {"MarkSt", "Марка стали"},
+        {"Temp", "Температура раската"},
+        {"NachDVal", "Нач диаметр валков"},
+        {"A1", "Отношение нач. диаметра к расч. высоте"},
+        {"StZapKalib1", "Кон. ст. заполнения калибра"}
+    };
+
+    public override Dictionary<string, string> OutputLabels => new Dictionary<string, string>
+    {
+        {"Result1", "Высота раската" },
+        {"Result2", "Ширина калибра" },
+        {"Result3", "Ширина раската" },
+        {"Result4", "Коэф. уширения" },
+        {"Result5", "Разница значений" },
+        {"Result6", "Ширина выреза ручья" }
+    };
+
+    public override double[] Calculate(double[] inputs)
+    {
+        return CalculationModule.CalculateOvalSquare(inputs);
+    }
+
+    public override string ImagePath => "Images/square_rhombus.PNG"; // Путь к изображению для режима
+}
+
+public class OvalCircleMode : CalculationMode
+{
+    public override string ModeName => "Овал-Круг";
+
+    public override Dictionary<string, string> InputLabels => new Dictionary<string, string>
+    {
+        {"Width0", "Ширина"},
+        {"StZapKalib", "Нач. ст. заполнения калибра"},
+        {"Rscrug", "Радиус скругления"},
+        {"KoefVit", "Коэффициент вытяжки"},
+        {"MarkSt", "Марка стали"},
+        {"Temp", "Температура раската"},
+        {"NachDVal", "Нач диаметр валков"},
+
+        {"StZapKalib1", "Кон. ст. заполнения калибра"}
+    };
+
+    public override Dictionary<string, string> OutputLabels => new Dictionary<string, string>
+    {
+        {"Result1", "Высота раската" },
+        {"Result2", "Ширина калибра" },
+        {"Result3", "Ширина раската" },
+        {"Result4", "Коэф. уширения" },
+        {"Result5", "Разница значений" },
+        {"Result6", "Ширина выреза ручья" },
+        {"A1", "Отношение нач. диаметра к расч. высоте"}
+    };
+
+    public override double[] Calculate(double[] inputs)
+    {
+        return CalculationModule.CalculateOvalCircle(inputs);
+    }
+
+    public override string ImagePath => "Images/square_rhombus.PNG"; // Путь к изображению для режима
+}
+
+public class FlatOvalCircleMode : CalculationMode
+{
+    public override string ModeName => "Плоский овал-Круг";
+
+    public override Dictionary<string, string> InputLabels => new Dictionary<string, string>
+    {
+        {"Width0", "Ширина"},
+        {"StZapKalib", "Нач. ст. заполнения калибра"},
+        {"Rscrug", "Радиус скругления"},
+        {"KoefVit", "Коэффициент вытяжки"},
+        {"MarkSt", "Марка стали"},
+        {"Temp", "Температура раската"},
+        {"NachDVal", "Нач диаметр валков"},
+        {"StZapKalib1", "Кон. ст. заполнения калибра"}
+    };
+
+    public override Dictionary<string, string> OutputLabels => new Dictionary<string, string>
+    {
+        {"Result1", "Высота раската" },
+        {"Result2", "Ширина калибра" },
+        {"Result3", "Ширина раската" },
+        {"Result4", "Коэф. уширения" },
+        {"Result5", "Разница значений" },
+        {"Result6", "Ширина выреза ручья" },
+        {"A1", "Отношение нач. диаметра к расч. высоте" }
+
+    };
+
+    public override double[] Calculate(double[] inputs)
+    {
+        return CalculationModule.CalculateFlatOvalCircle(inputs);
     }
 
     public override string ImagePath => "Images/square_rhombus.PNG"; // Путь к изображению для режима
