@@ -676,8 +676,9 @@ public class StudentCalculatorForm : Form
         int y = 0;
         foreach (var input in currentMode.InputLabels)
         {
-            var label = new Label { Text = input.Value, Location = new System.Drawing.Point(0, y), Width = 140 };
-            var textBox = new TextBox { Location = new System.Drawing.Point(140, y), Width = 100, Tag = input.Key };
+
+            var label = new Label { Text = input.Value, AutoSize = false, Location = new System.Drawing.Point(0, y-5), Padding = new Padding(2), Width = 130, MinimumSize = new Size(130, 30), MaximumSize = new Size(130, 0), TextAlign = ContentAlignment.MiddleLeft,  };
+            var textBox = new TextBox { Location = new System.Drawing.Point(131, y), Width = 100, Tag = input.Key };
             inputPanel.Controls.Add(label);
             inputPanel.Controls.Add(textBox);
             y += 30;
@@ -687,8 +688,8 @@ public class StudentCalculatorForm : Form
         y = 0;
         foreach (var output in currentMode.OutputLabels)
         {
-            var label = new Label { Text = output.Value, Location = new System.Drawing.Point(0, y), Width = 100 };
-            var textBox = new TextBox { Location = new System.Drawing.Point(110, y), Width = 100, ReadOnly = true, Tag = output.Key };
+            var label = new Label { Text = output.Value, Location = new System.Drawing.Point(0, y-5), AutoSize = false, Padding = new Padding(2), Width = 140, MinimumSize = new Size(140, 30), MaximumSize = new Size(140, 0), TextAlign = ContentAlignment.MiddleLeft, };
+            var textBox = new TextBox { Location = new System.Drawing.Point(150, y), Width = 100, ReadOnly = true, Tag = output.Key };
             outputPanel.Controls.Add(label);
             outputPanel.Controls.Add(textBox);
             y += 30;

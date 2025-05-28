@@ -216,12 +216,12 @@ public static class CalculationModule
 
         // 9. Возврат результатов
         return new double[] {
-        finalResults.height,    // result1: Расчетная высота
-        finalResults.widthK,    // result2: Ширина
-        finalResults.width1,    // result3: итоговая ширина
-        finalResults.beta,      // result4: коэффициент beta
-        finalDeviation,         // result5: отклонение
-        result6,               // result6: дополнительный параметр
+        finalResults.height,    // result1: расчетная высота
+        finalResults.widthK,    // result2: расчетная ширина калибра
+        finalResults.width1,    // result3: предварительная ширина раската
+        finalResults.beta,      // result4: коэффициент уширения beta
+        finalDeviation,         // result5: отклонение  
+        result6,               // result6: итоговая ширина раската
         optimalA1             // Оптимальное A1
     };
     }
