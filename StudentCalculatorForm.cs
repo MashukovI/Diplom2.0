@@ -1,16 +1,26 @@
-﻿using System;
+﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 
 public class StudentCalculatorForm : Form
 {
+    private Button exportWordOpenXmlButton;
+    private Button exportPdfButton;
+    private Button exportButton;
     private Button printButton;
     private Label userNameLabel;
     private Label Vicheslen;
@@ -35,19 +45,19 @@ public class StudentCalculatorForm : Form
 
         Vicheslen = new Label
         {
-            Location = new Point(10, 320), // Позиция на форме
+            Location = new System.Drawing.Point(10, 320), // Позиция на форме
             AutoSize = true, // Автоматический размер
-            Font = new Font("Times New Roman", 12, FontStyle.Bold), // Шрифт
-            ForeColor = Color.Black, // Цвет текста
+            Font = new System.Drawing.Font("Times New Roman", 12, FontStyle.Bold), // Шрифт
+            ForeColor = System.Drawing.Color.Black, // Цвет текста
             Text = "Все значения приводятся в миллиметрах и градусах цельсия" // Текст с именем пользователя
         };
         this.Controls.Add(Vicheslen);
         userNameLabel = new Label
         {
-            Location = new Point(250, 10),
+            Location = new System.Drawing.Point(250, 10),
             AutoSize = true,
-            Font = new Font("Times New Roman", 12, FontStyle.Bold),
-            ForeColor = Color.Black,
+            Font = new System.Drawing.Font("Times New Roman", 12, FontStyle.Bold),
+            ForeColor = System.Drawing.Color.Black,
             Text = $"Пользователь: {LoginForm.CurrentUserName}"
         };
         this.Controls.Add(userNameLabel);
@@ -61,40 +71,471 @@ public class StudentCalculatorForm : Form
         this.Size = new Size(550, 500);
 
         // ComboBox для выбора режима
-        modeComboBox = new ComboBox { Location = new Point(10, 10), Width = 200 };
+        modeComboBox = new ComboBox { Location = new System.Drawing.Point(10, 10), Width = 200 };
         modeComboBox.SelectedIndexChanged += ModeComboBox_SelectedIndexChanged;
         this.Controls.Add(modeComboBox);
 
         // Панели для динамических элементов
-        inputPanel = new Panel { Location = new Point(10, 40), Size = new Size(250, 300) };
-        outputPanel = new Panel { Location = new Point(270, 40), Size = new Size(250, 300) };
+        inputPanel = new Panel { Location = new System.Drawing.Point(10, 40), Size = new Size(250, 300) };
+        outputPanel = new Panel { Location = new System.Drawing.Point(270, 40), Size = new Size(250, 300) };
         this.Controls.Add(inputPanel);
         this.Controls.Add(outputPanel);
 
         // Кнопка "Calculate"
-        calculateButton = new Button { Location = new Point(10, 350), Size = new Size(100, 30), Text = "Calculate" };
+        calculateButton = new Button { Location = new System.Drawing.Point(10, 350), Size = new Size(100, 30), Text = "Calculate" };
         calculateButton.Click += CalculateButton_Click;
         this.Controls.Add(calculateButton);
 
         // Кнопка "History"
-        historyButton = new Button { Location = new Point(120, 350), Size = new Size(100, 30), Text = "History" };
+        historyButton = new Button { Location = new System.Drawing.Point(120, 350), Size = new Size(100, 30), Text = "History" };
         historyButton.Click += HistoryButton_Click;
         this.Controls.Add(historyButton);
 
         // Кнопка "Logout"
-        logoutButton = new Button { Location = new Point(230, 350), Size = new Size(100, 30), Text = "Logout" };
+        logoutButton = new Button { Location = new System.Drawing.Point(230, 350), Size = new Size(100, 30), Text = "Logout" };
         logoutButton.Click += LogoutButton_Click;
         this.Controls.Add(logoutButton);
 
         printButton = new Button
         {
-            Location = new Point(400, 350),
+            Location = new System.Drawing.Point(420, 350),
             Size = new Size(100, 30),
             Text = "Печать"
         };
         printButton.Click += PrintButton_Click;
         this.Controls.Add(printButton);
+
+
+        exportButton = new Button
+        {
+            Location = new System.Drawing.Point(230, 390),
+            Size = new Size(100, 30),
+            Text = "Экспорт в Excel"
+        };
+        exportButton.Click += ExportButton_Click;
+        this.Controls.Add(exportButton);
+
+        exportWordOpenXmlButton = new Button
+        {
+            Location = new System.Drawing.Point(10, 390),
+            Size = new Size(100, 30),
+            Text = "Экспорт в Word"
+        };
+        exportWordOpenXmlButton.Click += ExportWordOpenXmlButton_Click;
+        this.Controls.Add(exportWordOpenXmlButton);
+
+        exportPdfButton = new Button
+        {
+            Location = new System.Drawing.Point(120, 390),
+            Size = new Size(100, 30),
+            Text = "Экспорт в PDF"
+        };
+        exportPdfButton.Click += btnExportPdf_Click;
+        this.Controls.Add(exportPdfButton);
+
     }
+
+    private void ExportWordOpenXmlButton_Click(object sender, EventArgs e)
+    {
+        using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+        {
+            saveFileDialog.Filter = "Word Documents|*.docx";
+            saveFileDialog.Title = "Сохранить как Word документ";
+            saveFileDialog.FileName = $"Расчет_{currentMode.ModeName}_{DateTime.Now:yyyyMMddHHmmss}.docx";
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                WordExporter.ExportToWord(saveFileDialog.FileName, currentMode, GetTextBoxValue);
+            }
+        }
+    }
+
+    public class WordExporter
+    {
+        public static void ExportToWord(string filePath, CalculationMode currentMode, Func<string, string> getTextBoxValue)
+        {
+            try
+            {
+                // Создаем новый Word-документ
+                using (WordprocessingDocument doc = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document))
+                {
+                    // Добавляем основную часть документа
+                    MainDocumentPart mainPart = doc.AddMainDocumentPart();
+                    mainPart.Document = new DocumentFormat.OpenXml.Wordprocessing.Document();
+                    Body body = mainPart.Document.AppendChild(new Body());
+
+                    // Стиль для заголовка
+                    ParagraphProperties titleProps = new ParagraphProperties(
+                        new Justification() { Val = JustificationValues.Center },
+                        new SpacingBetweenLines() { After = "200" } // Отступ после заголовка
+                    );
+
+                    // Заголовок документа
+                    DocumentFormat.OpenXml.Wordprocessing.Paragraph title = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(titleProps);
+                    Run titleRun = new Run();
+                    Text titleText = new Text("Отчет о расчетах");
+
+                    // Настройки шрифта заголовка
+                    RunProperties titleRunProps = new RunProperties();
+                    titleRunProps.Append(new Bold());
+                    titleRunProps.Append(new FontSize() { Val = "32" }); // 16pt (1pt = 2)
+                    titleRunProps.Append(new RunFonts() { Ascii = "Arial" });
+
+                    titleRun.Append(titleRunProps);
+                    titleRun.Append(titleText);
+                    title.Append(titleRun);
+                    body.Append(title);
+
+                    // Информация о расчете
+                    AddParagraph(body, $"Режим: {currentMode.ModeName}", bold: false);
+                    AddParagraph(body, $"Пользователь: {LoginForm.CurrentUserName}", bold: false);
+                    AddParagraph(body, $"Дата: {DateTime.Now:g}", bold: false);
+                    body.Append(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new Run(new Break()))); // Пустая строка
+
+                    // Таблица с входными параметрами
+                    AddSectionHeader(body, "Входные параметры:");
+                    AddParametersTable(body, currentMode.InputLabels, getTextBoxValue);
+
+                    // Таблица с выходными параметрами
+                    AddSectionHeader(body, "Выходные параметры:");
+                    AddParametersTable(body, currentMode.OutputLabels, getTextBoxValue);
+
+                    // Сохраняем документ
+                    doc.MainDocumentPart.Document.Save();
+                }
+
+                MessageBox.Show("Документ успешно сохранен!", "Экспорт завершен",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при создании Word-документа: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private static void AddSectionHeader(Body body, string text)
+        {
+            DocumentFormat.OpenXml.Wordprocessing.Paragraph header = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
+                new ParagraphProperties(
+                    new SpacingBetweenLines() { After = "100" } // Отступ после заголовка
+                ),
+                new Run(
+                    new RunProperties(
+                        new Bold(),
+                        new FontSize() { Val = "24" } // 12pt
+                    ),
+                    new Text(text)
+                )
+            );
+            body.Append(header);
+        }
+
+        private static void AddParagraph(Body body, string text, bool bold = false)
+        {
+            RunProperties runProps = new RunProperties();
+            if (bold) runProps.Append(new Bold());
+            runProps.Append(new FontSize() { Val = "22" }); // 11pt
+
+            DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
+                new Run(
+                    runProps,
+                    new Text(text)
+                )
+            );
+            body.Append(paragraph);
+        }
+
+        private static void AddParametersTable(Body body, Dictionary<string, string> labels, Func<string, string> getTextBoxValue)
+        {
+            Table table = new Table();
+
+            // Настройки таблицы
+            TableProperties tableProps = new TableProperties(
+                new TableBorders(
+                    new TopBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 4 },
+                    new BottomBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 4 },
+                    new LeftBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 4 },
+                    new RightBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 4 },
+                    new InsideHorizontalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 4 },
+                    new InsideVerticalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 4 }
+                ),
+                new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct } // 100% ширины
+            );
+            table.AppendChild(tableProps);
+
+            foreach (var item in labels)
+            {
+                TableRow row = new TableRow();
+
+                // Ячейка с названием параметра
+                TableCell nameCell = new TableCell(
+                    new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
+                        new Run(
+                            new Text(item.Value)
+                        )
+                    )
+                );
+
+                // Ячейка со значением
+                TableCell valueCell = new TableCell(
+                    new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
+                        new Run(
+                            new Text(getTextBoxValue(item.Key))
+                        )
+                    )
+                );
+
+                row.Append(nameCell, valueCell);
+                table.Append(row);
+            }
+
+            body.Append(table);
+            body.Append(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new Run(new Break()))); // Пустая строка после таблицы
+        }
+    }
+
+    private void btnExportPdf_Click(object sender, EventArgs e)
+    {
+        using (SaveFileDialog saveDialog = new SaveFileDialog())
+        {
+            saveDialog.Filter = "PDF files (*.pdf)|*.pdf";
+            saveDialog.Title = "Экспорт в PDF";
+            saveDialog.FileName = $"Расчет_{currentMode.ModeName}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+
+            if (saveDialog.ShowDialog() == DialogResult.OK)
+            {
+                PdfExporter.ExportToPdf(saveDialog.FileName, currentMode, GetTextBoxValue);
+            }
+        }
+    }
+
+    public static class PdfExporter
+    {
+        public static void ExportToPdf(string filePath, CalculationMode currentMode, Func<string, string> getTextBoxValue)
+        {
+            // Создаем документ A4 с полями (левое, правое, верхнее, нижнее)
+            using (var pdfDocument = new iTextSharp.text.Document(iTextSharp.text.PageSize.A4, 40, 40, 40, 40))
+            {
+                try
+                {
+                    // Настройка writer для создания PDF
+                    PdfWriter writer = PdfWriter.GetInstance(pdfDocument, new FileStream(filePath, FileMode.Create));
+
+                    // Открываем документ для записи
+                    pdfDocument.Open();
+
+                    // Шрифт с поддержкой кириллицы
+                    string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arial.ttf");
+                    BaseFont baseFont = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+
+                    // Стили текста
+                    iTextSharp.text.Font titleFont = new iTextSharp.text.Font(baseFont, 18, iTextSharp.text.Font.BOLD, BaseColor.DARK_GRAY);
+                    iTextSharp.text.Font headerFont = new iTextSharp.text.Font(baseFont, 12, iTextSharp.text.Font.BOLD, BaseColor.BLACK);
+                    iTextSharp.text.Font normalFont = new iTextSharp.text.Font(baseFont, 11, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
+                    iTextSharp.text.Font valueFont = new iTextSharp.text.Font(baseFont, 11, iTextSharp.text.Font.BOLD, BaseColor.BLUE);
+
+                    // Заголовок документа
+                    var title = new iTextSharp.text.Paragraph("ОТЧЕТ О РАСЧЕТАХ", titleFont);
+                    title.Alignment = Element.ALIGN_CENTER;
+                    title.SpacingAfter = 20;
+                    pdfDocument.Add(title);
+
+                    // Блок информации
+                    AddInfoBlock(pdfDocument, currentMode, normalFont);
+
+                    // Таблица входных параметров
+                    AddParameterTable(
+                        pdfDocument,
+                        "ВХОДНЫЕ ПАРАМЕТРЫ",
+                        currentMode.InputLabels,
+                        getTextBoxValue,
+                        headerFont,
+                        normalFont,
+                        valueFont);
+
+                    // Таблица выходных параметров
+                    AddParameterTable(
+                        pdfDocument,
+                        "РЕЗУЛЬТАТЫ РАСЧЕТА",
+                        currentMode.OutputLabels,
+                        getTextBoxValue,
+                        headerFont,
+                        normalFont,
+                        valueFont);
+
+                    // Подпись
+                    var signature = new iTextSharp.text.Paragraph(
+                        $"Сформировано: {DateTime.Now:dd.MM.yyyy HH:mm}",
+                        new iTextSharp.text.Font(baseFont, 10, iTextSharp.text.Font.ITALIC, BaseColor.GRAY));
+                    signature.Alignment = Element.ALIGN_RIGHT;
+                    pdfDocument.Add(signature);
+
+                    MessageBox.Show("PDF-документ успешно сохранен!", "Экспорт завершен",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при создании PDF:\n{ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private static void AddInfoBlock(iTextSharp.text.Document doc, CalculationMode mode, iTextSharp.text.Font font)
+        {
+            var infoTable = new PdfPTable(2);
+            infoTable.WidthPercentage = 100;
+            infoTable.SetWidths(new float[] { 30, 70 });
+            infoTable.SpacingAfter = 15;
+
+            AddInfoRow(infoTable, "Режим расчета:", mode.ModeName, font);
+            AddInfoRow(infoTable, "Пользователь:", LoginForm.CurrentUserName, font);
+            AddInfoRow(infoTable, "Дата расчета:", DateTime.Now.ToString("dd.MM.yyyy HH:mm"), font);
+
+            doc.Add(infoTable);
+        }
+
+        private static void AddInfoRow(PdfPTable table, string label, string value, iTextSharp.text.Font font)
+        {
+            table.AddCell(new PdfPCell(new Phrase(label, font))
+            {
+                Border = PdfPCell.NO_BORDER,
+                BackgroundColor = new BaseColor(240, 240, 240)
+            });
+
+            table.AddCell(new PdfPCell(new Phrase(value, font))
+            {
+                Border = PdfPCell.NO_BORDER
+            });
+        }
+
+        private static void AddParameterTable(
+            iTextSharp.text.Document doc,
+            string title,
+            Dictionary<string, string> parameters,
+            Func<string, string> getValue,
+            iTextSharp.text.Font headerFont,
+            iTextSharp.text.Font labelFont,
+            iTextSharp.text.Font valueFont)
+        {
+            // Заголовок раздела
+            var sectionHeader = new iTextSharp.text.Paragraph(title, headerFont);
+            sectionHeader.SpacingAfter = 10;
+            doc.Add(sectionHeader);
+
+            // Создаем таблицу (2 колонки)
+            PdfPTable table = new PdfPTable(2);
+            table.WidthPercentage = 100;
+            table.SetWidths(new float[] { 60, 40 });
+            table.SpacingAfter = 20;
+
+            // Настройка стиля ячеек
+            table.DefaultCell.Padding = 5;
+            table.DefaultCell.MinimumHeight = 25;
+
+            // Добавляем данные
+            foreach (var param in parameters)
+            {
+                // Ячейка с названием параметра
+                PdfPCell nameCell = new PdfPCell(new Phrase(param.Value, labelFont));
+                nameCell.BorderWidth = 0.5f;
+                nameCell.BorderColor = BaseColor.LIGHT_GRAY;
+                table.AddCell(nameCell);
+
+                // Ячейка со значением
+                PdfPCell valueCell = new PdfPCell(new Phrase(getValue(param.Key), valueFont));
+                valueCell.BorderWidth = 0.5f;
+                valueCell.BorderColor = BaseColor.LIGHT_GRAY;
+                valueCell.HorizontalAlignment = Element.ALIGN_RIGHT;
+                table.AddCell(valueCell);
+            }
+
+            doc.Add(table);
+        }
+    }
+
+
+    private void ExportButton_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "Excel Files|*.xlsx";
+                saveFileDialog.Title = "Сохранить как Excel файл";
+                saveFileDialog.FileName = $"Расчет_{currentMode.ModeName}_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    ExportToExcel(saveFileDialog.FileName);
+                    MessageBox.Show("Данные успешно экспортированы в Excel!", "Успех",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Ошибка при экспорте в Excel: {ex.Message}", "Ошибка",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void ExportToExcel(string filePath)
+    {
+        using (var workbook = new XLWorkbook())
+        {
+            var worksheet = workbook.Worksheets.Add("Расчет");
+
+            // Заголовок
+            worksheet.Cell(1, 1).Value = "Отчет о расчетах";
+            worksheet.Range(1, 1, 1, 2).Merge().Style.Font.Bold = true;
+
+            // Информация о расчете
+            worksheet.Cell(2, 1).Value = "Режим:";
+            worksheet.Cell(2, 2).Value = currentMode.ModeName;
+
+            worksheet.Cell(3, 1).Value = "Пользователь:";
+            worksheet.Cell(3, 2).Value = LoginForm.CurrentUserName;
+
+            worksheet.Cell(4, 1).Value = "Дата:";
+            worksheet.Cell(4, 2).Value = DateTime.Now.ToString("g");
+
+            // Входные параметры
+            worksheet.Cell(6, 1).Value = "Входные параметры";
+            worksheet.Cell(6, 1).Style.Font.Bold = true;
+
+            int row = 7;
+            foreach (var input in currentMode.InputLabels)
+            {
+                worksheet.Cell(row, 1).Value = input.Value;
+                worksheet.Cell(row, 2).Value = GetTextBoxValue(input.Key);
+                row++;
+            }
+
+            // Выходные параметры
+            worksheet.Cell(row, 1).Value = "Выходные параметры";
+            worksheet.Cell(row, 1).Style.Font.Bold = true;
+            row++;
+
+            foreach (var output in currentMode.OutputLabels)
+            {
+                worksheet.Cell(row, 1).Value = output.Value;
+                worksheet.Cell(row, 2).Value = GetTextBoxValue(output.Key);
+                row++;
+            }
+
+            // Настройка ширины столбцов
+            worksheet.Column(1).AdjustToContents();
+            worksheet.Column(2).AdjustToContents();
+
+            // Сохраняем файл
+            workbook.SaveAs(filePath);
+        }
+    }
+
+
+
 
     private void PrintButton_Click(object sender, EventArgs e)
     {
@@ -146,8 +587,8 @@ public class StudentCalculatorForm : Form
 
     private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
     {
-        Font font = new Font("Arial", 12);
-        Font headerFont = new Font("Arial", 14, FontStyle.Bold);
+        System.Drawing.Font font = new System.Drawing.Font("Arial", 12);
+        System.Drawing.Font headerFont = new System.Drawing.    Font("Arial", 14, FontStyle.Bold);
 
         // Заголовок
         e.Graphics.DrawString("Отчет о расчетах", headerFont, Brushes.Black, 100, 50);
@@ -207,7 +648,7 @@ public class StudentCalculatorForm : Form
     private string GetTextBoxValue(string tag)
     {
         // Поиск в inputPanel
-        foreach (Control control in inputPanel.Controls)
+        foreach (System.Windows.Forms.Control control in inputPanel.Controls)
         {
             if (control is TextBox textBox && textBox.Tag?.ToString() == tag)
             {
@@ -216,7 +657,7 @@ public class StudentCalculatorForm : Form
         }
 
         // Поиск в outputPanel
-        foreach (Control control in outputPanel.Controls)
+        foreach (System.Windows.Forms.Control control in outputPanel.Controls)
         {
             if (control is TextBox textBox && textBox.Tag?.ToString() == tag)
             {
@@ -235,8 +676,8 @@ public class StudentCalculatorForm : Form
         int y = 0;
         foreach (var input in currentMode.InputLabels)
         {
-            var label = new Label { Text = input.Value, Location = new Point(0, y), Width = 140 };
-            var textBox = new TextBox { Location = new Point(140, y), Width = 100, Tag = input.Key };
+            var label = new Label { Text = input.Value, Location = new System.Drawing.Point(0, y), Width = 140 };
+            var textBox = new TextBox { Location = new System.Drawing.Point(140, y), Width = 100, Tag = input.Key };
             inputPanel.Controls.Add(label);
             inputPanel.Controls.Add(textBox);
             y += 30;
@@ -246,8 +687,8 @@ public class StudentCalculatorForm : Form
         y = 0;
         foreach (var output in currentMode.OutputLabels)
         {
-            var label = new Label { Text = output.Value, Location = new Point(0, y), Width = 100 };
-            var textBox = new TextBox { Location = new Point(110, y), Width = 100, ReadOnly = true, Tag = output.Key };
+            var label = new Label { Text = output.Value, Location = new System.Drawing.Point(0, y), Width = 100 };
+            var textBox = new TextBox { Location = new System.Drawing.Point(110, y), Width = 100, ReadOnly = true, Tag = output.Key };
             outputPanel.Controls.Add(label);
             outputPanel.Controls.Add(textBox);
             y += 30;
@@ -304,7 +745,7 @@ public class StudentCalculatorForm : Form
     }
     private void SetTextBoxValue(string tag, string value)
     {
-        foreach (Control control in inputPanel.Controls)
+        foreach (System.Windows.Forms.Control control in inputPanel.Controls)
         {
             if (control is TextBox textBox && textBox.Tag?.ToString() == tag)
             {
@@ -319,7 +760,7 @@ public class StudentCalculatorForm : Form
     {
         // Сбор входных данных
         var inputs = new Dictionary<string, double>();
-        foreach (Control control in inputPanel.Controls)
+        foreach (System.Windows.Forms.Control control in inputPanel.Controls)
         {
             if (control is TextBox textBox && textBox.Tag != null)
             {
@@ -337,7 +778,7 @@ public class StudentCalculatorForm : Form
 
         // Отображение результатов
         int i = 0;
-        foreach (Control control in outputPanel.Controls)
+        foreach (System.Windows.Forms.Control control in outputPanel.Controls)
         {
             if (control is TextBox textBox)
             {
