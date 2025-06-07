@@ -1,9 +1,13 @@
 ﻿using System.Data.SqlClient;
 using System.Windows.Forms;
 using System;
+using System.Drawing;
 
 public class RegistrationForm : Form
 {
+    private Label usernameLabel;
+    private Label passwordLabel;
+    private Label confirmpasswordLabel;
     private TextBox usernameTextBox;
     private TextBox passwordTextBox;
     private TextBox confirmPasswordTextBox;
@@ -20,39 +24,74 @@ public class RegistrationForm : Form
 
     private void InitializeForm()
     {
+
+        this.passwordLabel = new Label();
+        this.confirmpasswordLabel = new Label();
         this.usernameTextBox = new TextBox();
         this.passwordTextBox = new TextBox();
         this.confirmPasswordTextBox = new TextBox();
         this.roleComboBox = new ComboBox();
         this.registerButton = new Button();
 
+
+        usernameLabel = new Label
+        {
+            Location = new System.Drawing.Point(10, 10), // Позиция на форме
+            AutoSize = true, // Автоматический размер
+            Font = new System.Drawing.Font("Times New Roman", 10 ), // Шрифт
+            ForeColor = System.Drawing.Color.Black, // Цвет текста
+            Text = "Имя пользователя" // Текст с именем пользователя
+        };
+        this.Controls.Add(usernameLabel);
+
         // Настройка TextBox для логина
-        this.usernameTextBox.Location = new System.Drawing.Point(10, 10);
+        this.usernameTextBox.Location = new System.Drawing.Point(10, 30);
         this.usernameTextBox.Size = new System.Drawing.Size(200, 20);
         this.usernameTextBox.Text = "Username";
 
+        passwordLabel = new Label
+        {
+            Location = new System.Drawing.Point(10, 50), // Позиция на форме
+            AutoSize = true, // Автоматический размер
+            Font = new System.Drawing.Font("Times New Roman", 10), // Шрифт
+            ForeColor = System.Drawing.Color.Black, // Цвет текста
+            Text = "Пароль" // Текст с именем пользователя
+        };
+        this.Controls.Add(passwordLabel);
+
         // Настройка TextBox для пароля
-        this.passwordTextBox.Location = new System.Drawing.Point(10, 40);
+        this.passwordTextBox.Location = new System.Drawing.Point(10, 70);
         this.passwordTextBox.Size = new System.Drawing.Size(200, 20);
         this.passwordTextBox.Text = "Password";
         this.passwordTextBox.UseSystemPasswordChar = true;
 
+        confirmpasswordLabel = new Label
+        {
+            Location = new System.Drawing.Point(10, 90), // Позиция на форме
+            AutoSize = true, // Автоматический размер
+            Font = new System.Drawing.Font("Times New Roman", 10), // Шрифт
+            ForeColor = System.Drawing.Color.Black, // Цвет текста
+            Text = "Подтвердите пароль" // Текст с именем пользователя
+        };
+        this.Controls.Add(confirmpasswordLabel);
+
         // Настройка TextBox для подтверждения пароля
-        this.confirmPasswordTextBox.Location = new System.Drawing.Point(10, 70);
+        this.confirmPasswordTextBox.Location = new System.Drawing.Point(10, 110);
         this.confirmPasswordTextBox.Size = new System.Drawing.Size(200, 20);
         this.confirmPasswordTextBox.Text = "Confirm Password";
         this.confirmPasswordTextBox.UseSystemPasswordChar = true;
 
+
         // Настройка ComboBox для роли
-        this.roleComboBox.Location = new System.Drawing.Point(10, 100);
+        this.roleComboBox.Location = new System.Drawing.Point(10, 140);
         this.roleComboBox.Size = new System.Drawing.Size(200, 20);
         this.roleComboBox.Items.AddRange(new string[] { "Student", "Teacher" });
         this.roleComboBox.SelectedIndex = 0;
 
         // Настройка кнопки регистрации
-        this.registerButton.Location = new System.Drawing.Point(10, 130);
+        this.registerButton.Location = new System.Drawing.Point(10, 170);
         this.registerButton.Size = new System.Drawing.Size(100, 30);
-        this.registerButton.Text = "Register";
+        this.registerButton.Text = "Регистрация";
         this.registerButton.Click += new EventHandler(this.RegisterButton_Click);
 
         // Добавление элементов на форму
@@ -64,7 +103,7 @@ public class RegistrationForm : Form
 
         // Настройка формы
         this.Text = "Registration";
-        this.Size = new System.Drawing.Size(250, 200);
+        this.Size = new System.Drawing.Size(250, 260);
     }
 
     private void RegisterButton_Click(object sender, EventArgs e)

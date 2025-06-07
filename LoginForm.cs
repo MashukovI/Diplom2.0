@@ -9,6 +9,8 @@ public class LoginForm : Form
     private static int _currentUserId;
     private static string _currentUserRole;
     private static int _currentUserGroupId;
+    private Label usernameLabel;
+    private Label passwordLabel;
     public static int CurrentUserId { get; private set; }
     public static string CurrentUserRole { get; private set; }
     public static int CurrentUserGroupId { get; private set; }
@@ -34,18 +36,36 @@ public class LoginForm : Form
         this.loginButton = new Button();
         this.registerButton = new Button();
 
+        usernameLabel = new Label
+        {
+            Location = new System.Drawing.Point(10, 10), // Позиция на форме
+            AutoSize = true, // Автоматический размер
+            Font = new System.Drawing.Font("Times New Roman", 10), // Шрифт
+            ForeColor = System.Drawing.Color.Black, // Цвет текста
+            Text = "Имя пользователя" // Текст с именем пользователя
+        };
+        this.Controls.Add(usernameLabel);
         // Настройка TextBox для логина
         this.usernameTextBox = new TextBox
         {
-            Location = new Point(10, 10),
+            Location = new Point(10, 30),
             Size = new Size(200, 20),
             Text = "Username"
         };
+        passwordLabel = new Label
+        {
+            Location = new System.Drawing.Point(10, 60), // Позиция на форме
+            AutoSize = true, // Автоматический размер
+            Font = new System.Drawing.Font("Times New Roman", 10), // Шрифт
+            ForeColor = System.Drawing.Color.Black, // Цвет текста
+            Text = "Пароль" // Текст с именем пользователя
+        };
+        this.Controls.Add(passwordLabel);
 
         // Настройка TextBox для пароля
         this.passwordTextBox = new TextBox
         {
-            Location = new Point(10, 40),
+            Location = new Point(10, 80),
             Size = new Size(200, 20),
             Text = "111111",
             UseSystemPasswordChar = true
@@ -54,7 +74,7 @@ public class LoginForm : Form
         // Настройка кнопки регистрации
         this.registerButton = new Button
         {
-            Location = new Point(110, 70),
+            Location = new Point(110, 110),
             Size = new Size(90, 30),
             Text = "Регистрация"
         };
@@ -63,7 +83,7 @@ public class LoginForm : Form
         // Настройка кнопки
         this.loginButton = new Button
         {
-            Location = new Point(10, 70),
+            Location = new Point(10, 110),
             Size = new Size(90, 30),
             Text = "Войти"
         };
@@ -77,7 +97,7 @@ public class LoginForm : Form
 
         // Настройка формы
         this.Text = "Войти";
-        this.Size = new System.Drawing.Size(250, 150);
+        this.Size = new System.Drawing.Size(250, 200);
     }
 
     private void RegisterButton_Click(object sender, EventArgs e)
@@ -106,7 +126,7 @@ public class LoginForm : Form
                 DataRow row = result.Rows[0];
                 CurrentUserId = Convert.ToInt32(row["UserId"]);
                 CurrentUserRole = row["Role"].ToString();
-                CurrentUserName = row["Username"].ToString(); // Сохраняем имя пользователя
+                CurrentUserName = row["Username"].ToString();
 
                 if (CurrentUserRole == "Student")
                 {
@@ -114,7 +134,7 @@ public class LoginForm : Form
                 }
 
                 MessageBox.Show("Login successful!");
-                this.Close(); // Закрываем форму входа после открытия главной формы
+                this.Close();
                 this.DialogResult = DialogResult.OK;
             }
             else

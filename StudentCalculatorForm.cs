@@ -23,7 +23,7 @@ public class StudentCalculatorForm : Form
     private Button exportButton;
     private Button printButton;
     private Label userNameLabel;
-    private Label Vicheslen;
+
     private ComboBox modeComboBox;
     private Panel inputPanel;
     private Panel outputPanel;
@@ -42,16 +42,17 @@ public class StudentCalculatorForm : Form
 
     private void InitializeForm()
     {
-
-        Vicheslen = new Label
+        modePictureBox = new PictureBox
         {
-            Location = new System.Drawing.Point(10, 320), // Позиция на форме
-            AutoSize = true, // Автоматический размер
-            Font = new System.Drawing.Font("Times New Roman", 12, FontStyle.Bold), // Шрифт
-            ForeColor = System.Drawing.Color.Black, // Цвет текста
-            Text = "Все значения приводятся в миллиметрах и градусах цельсия" // Текст с именем пользователя
+            Location = new Point(340, 330), 
+            Size = new Size(240, 170),      
+            SizeMode = PictureBoxSizeMode.Zoom, 
+            BorderStyle = BorderStyle.FixedSingle 
         };
-        this.Controls.Add(Vicheslen);
+        this.Controls.Add(modePictureBox);
+
+        
+
         userNameLabel = new Label
         {
             Location = new System.Drawing.Point(250, 10),
@@ -68,7 +69,7 @@ public class StudentCalculatorForm : Form
         this.Controls.Add(modePictureBox);
 
         this.Text = "Student Calculator";
-        this.Size = new Size(550, 500);
+        this.Size = new Size(600, 550);
 
         // ComboBox для выбора режима
         modeComboBox = new ComboBox { Location = new System.Drawing.Point(10, 10), Width = 200 };
@@ -82,23 +83,23 @@ public class StudentCalculatorForm : Form
         this.Controls.Add(outputPanel);
 
         // Кнопка "Calculate"
-        calculateButton = new Button { Location = new System.Drawing.Point(10, 350), Size = new Size(100, 30), Text = "Calculate" };
+        calculateButton = new Button { Location = new System.Drawing.Point(10, 360), Size = new Size(100, 30), Text = "Рассчитать" };
         calculateButton.Click += CalculateButton_Click;
         this.Controls.Add(calculateButton);
 
         // Кнопка "History"
-        historyButton = new Button { Location = new System.Drawing.Point(120, 350), Size = new Size(100, 30), Text = "History" };
+        historyButton = new Button { Location = new System.Drawing.Point(120, 360), Size = new Size(100, 30), Text = "История" };
         historyButton.Click += HistoryButton_Click;
         this.Controls.Add(historyButton);
 
         // Кнопка "Logout"
-        logoutButton = new Button { Location = new System.Drawing.Point(230, 350), Size = new Size(100, 30), Text = "Logout" };
+        logoutButton = new Button { Location = new System.Drawing.Point(230, 360), Size = new Size(100, 30), Text = "Выход" };
         logoutButton.Click += LogoutButton_Click;
         this.Controls.Add(logoutButton);
 
         printButton = new Button
         {
-            Location = new System.Drawing.Point(420, 350),
+            Location = new System.Drawing.Point(10, 440),
             Size = new Size(100, 30),
             Text = "Печать"
         };
@@ -108,7 +109,7 @@ public class StudentCalculatorForm : Form
 
         exportButton = new Button
         {
-            Location = new System.Drawing.Point(230, 390),
+            Location = new System.Drawing.Point(230, 400),
             Size = new Size(100, 30),
             Text = "Экспорт в Excel"
         };
@@ -117,7 +118,7 @@ public class StudentCalculatorForm : Form
 
         exportWordOpenXmlButton = new Button
         {
-            Location = new System.Drawing.Point(10, 390),
+            Location = new System.Drawing.Point(10, 400),
             Size = new Size(100, 30),
             Text = "Экспорт в Word"
         };
@@ -126,7 +127,7 @@ public class StudentCalculatorForm : Form
 
         exportPdfButton = new Button
         {
-            Location = new System.Drawing.Point(120, 390),
+            Location = new System.Drawing.Point(120, 400),
             Size = new Size(100, 30),
             Text = "Экспорт в PDF"
         };
@@ -148,7 +149,7 @@ public class StudentCalculatorForm : Form
                 WordExporter.ExportToWord(saveFileDialog.FileName, currentMode, GetTextBoxValue);
             }
         }
-    }
+    }   
 
     public class WordExporter
     {
@@ -156,102 +157,48 @@ public class StudentCalculatorForm : Form
         {
             try
             {
-                // Создаем новый Word-документ
-                using (WordprocessingDocument doc = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document))
+                using (var doc = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document))
                 {
-                    // Добавляем основную часть документа
-                    MainDocumentPart mainPart = doc.AddMainDocumentPart();
-                    mainPart.Document = new DocumentFormat.OpenXml.Wordprocessing.Document();
-                    Body body = mainPart.Document.AppendChild(new Body());
+                    var mainPart = doc.AddMainDocumentPart();
+                    mainPart.Document = new DocumentFormat.OpenXml.Wordprocessing.Document(new Body());
+                    var body = mainPart.Document.Body;
 
-                    // Стиль для заголовка
-                    ParagraphProperties titleProps = new ParagraphProperties(
-                        new Justification() { Val = JustificationValues.Center },
-                        new SpacingBetweenLines() { After = "200" } // Отступ после заголовка
-                    );
-
-                    // Заголовок документа
-                    DocumentFormat.OpenXml.Wordprocessing.Paragraph title = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(titleProps);
-                    Run titleRun = new Run();
-                    Text titleText = new Text("Отчет о расчетах");
-
-                    // Настройки шрифта заголовка
-                    RunProperties titleRunProps = new RunProperties();
-                    titleRunProps.Append(new Bold());
-                    titleRunProps.Append(new FontSize() { Val = "32" }); // 16pt (1pt = 2)
-                    titleRunProps.Append(new RunFonts() { Ascii = "Arial" });
-
-                    titleRun.Append(titleRunProps);
-                    titleRun.Append(titleText);
-                    title.Append(titleRun);
-                    body.Append(title);
+                    // Заголовок
+                    body.Append(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
+                        new ParagraphProperties(new Justification() { Val = JustificationValues.Center }, new SpacingBetweenLines() { After = "200" }),
+                        new Run(new RunProperties(new Bold(), new FontSize() { Val = "32" }, new RunFonts() { Ascii = "Arial" }),
+                            new Text("Отчет о расчетах"))
+                    ));
 
                     // Информация о расчете
-                    AddParagraph(body, $"Режим: {currentMode.ModeName}", bold: false);
-                    AddParagraph(body, $"Пользователь: {LoginForm.CurrentUserName}", bold: false);
-                    AddParagraph(body, $"Дата: {DateTime.Now:g}", bold: false);
-                    body.Append(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new Run(new Break()))); // Пустая строка
+                    body.AppendChild(CreateParagraph($"Режим: {currentMode.ModeName}"));
+                    body.AppendChild(CreateParagraph($"Пользователь: {LoginForm.CurrentUserName}"));
+                    body.AppendChild(CreateParagraph($"Дата: {DateTime.Now:g}"));
+                    body.Append(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new Run(new Break())));
 
-                    // Таблица с входными параметрами
-                    AddSectionHeader(body, "Входные параметры:");
-                    AddParametersTable(body, currentMode.InputLabels, getTextBoxValue);
+                    // Таблицы параметров
+                    AddSection(body, "Входные параметры:", currentMode.InputLabels, getTextBoxValue);
+                    AddSection(body, "Выходные параметры:", currentMode.OutputLabels, getTextBoxValue);
 
-                    // Таблица с выходными параметрами
-                    AddSectionHeader(body, "Выходные параметры:");
-                    AddParametersTable(body, currentMode.OutputLabels, getTextBoxValue);
-
-                    // Сохраняем документ
                     doc.MainDocumentPart.Document.Save();
                 }
 
-                MessageBox.Show("Документ успешно сохранен!", "Экспорт завершен",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Документ успешно сохранен!", "Экспорт завершен", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при создании Word-документа: {ex.Message}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка при создании Word-документа: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private static void AddSectionHeader(Body body, string text)
+        private static void AddSection(Body body, string title, Dictionary<string, string> labels, Func<string, string> getTextBoxValue)
         {
-            DocumentFormat.OpenXml.Wordprocessing.Paragraph header = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
-                new ParagraphProperties(
-                    new SpacingBetweenLines() { After = "100" } // Отступ после заголовка
-                ),
-                new Run(
-                    new RunProperties(
-                        new Bold(),
-                        new FontSize() { Val = "24" } // 12pt
-                    ),
-                    new Text(text)
-                )
-            );
-            body.Append(header);
-        }
+            body.Append(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
+                new ParagraphProperties(new SpacingBetweenLines() { After = "100" }),
+                new Run(new RunProperties(new Bold(), new FontSize() { Val = "24" }), new Text(title))
+            ));
 
-        private static void AddParagraph(Body body, string text, bool bold = false)
-        {
-            RunProperties runProps = new RunProperties();
-            if (bold) runProps.Append(new Bold());
-            runProps.Append(new FontSize() { Val = "22" }); // 11pt
-
-            DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
-                new Run(
-                    runProps,
-                    new Text(text)
-                )
-            );
-            body.Append(paragraph);
-        }
-
-        private static void AddParametersTable(Body body, Dictionary<string, string> labels, Func<string, string> getTextBoxValue)
-        {
-            Table table = new Table();
-
-            // Настройки таблицы
-            TableProperties tableProps = new TableProperties(
+            var table = new Table(new TableProperties(
                 new TableBorders(
                     new TopBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 4 },
                     new BottomBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 4 },
@@ -260,38 +207,28 @@ public class StudentCalculatorForm : Form
                     new InsideHorizontalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 4 },
                     new InsideVerticalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 4 }
                 ),
-                new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct } // 100% ширины
-            );
-            table.AppendChild(tableProps);
+                new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct }
+            ));
 
             foreach (var item in labels)
             {
-                TableRow row = new TableRow();
-
-                // Ячейка с названием параметра
-                TableCell nameCell = new TableCell(
-                    new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
-                        new Run(
-                            new Text(item.Value)
-                        )
-                    )
-                );
-
-                // Ячейка со значением
-                TableCell valueCell = new TableCell(
-                    new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
-                        new Run(
-                            new Text(getTextBoxValue(item.Key))
-                        )
-                    )
-                );
-
-                row.Append(nameCell, valueCell);
-                table.Append(row);
+                table.Append(new TableRow(
+                    new TableCell(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new Run(new Text(item.Value)))),
+                    new TableCell(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new Run(new Text(getTextBoxValue(item.Key)))))
+                ));
             }
 
             body.Append(table);
-            body.Append(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new Run(new Break()))); // Пустая строка после таблицы
+            body.Append(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new Run(new Break())));
+        }
+
+        private static DocumentFormat.OpenXml.Wordprocessing.Paragraph CreateParagraph(string text, bool bold = false)
+        {
+            var runProps = new RunProperties();
+            if (bold) runProps.Append(new Bold());
+            runProps.Append(new FontSize() { Val = "22" });
+
+            return new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new Run(runProps, new Text(text)));
         }
     }
 
@@ -618,7 +555,38 @@ public class StudentCalculatorForm : Form
     {
         currentMode = (CalculationMode)modeComboBox.SelectedItem;
         UpdateInterface();
+        LoadModeImage(); // Метод для загрузки изображения
     }
+
+    private void LoadModeImage()
+    {
+        if (currentMode != null && !string.IsNullOrEmpty(currentMode.ImagePath))
+        {
+            try
+            {
+                string imagePath = Path.Combine(Application.StartupPath, currentMode.ImagePath);
+                if (File.Exists(imagePath))
+                {
+                    modePictureBox.Image = System.Drawing.Image.FromFile(imagePath);
+                }
+                else
+                {
+                    MessageBox.Show($"Изображение для режима \"{currentMode.ModeName}\" не найдено:\n{imagePath}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    modePictureBox.Image = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки изображения: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                modePictureBox.Image = null;
+            }
+        }
+        else
+        {
+            modePictureBox.Image = null;
+        }
+    }
+
     private void OptimizeA1Button_Click(object sender, EventArgs e)
     {
         try
@@ -897,29 +865,30 @@ public class SquareOvalMode : CalculationMode
 
 public class SquareRhombusMode : CalculationMode
 {
+    
     public override string ModeName => "Квадрат-Ромб";
 
     public override Dictionary<string, string> InputLabels => new Dictionary<string, string>
     {
-        {"Width0", "Ширина"},
+        {"Width0", "Сторона квадрата, мм"},
         {"StZapKalib", "Нач. ст. заполнения калибра"},
-        {"Rscrug", "Радиус скругления"},
+        {"Rscrug", "Радиус скругления, °"},
         {"KoefVit", "Коэффициент вытяжки"},
         {"MarkSt", "Марка стали"},
-        {"Temp", "Температура раската"},
-        {"NachDVal", "Нач диаметр валков"},
+        {"Temp", "Температура раската, °С"},
+        {"NachDVal", "Нач диаметр валков, мм"},
         
         {"StZapKalib1", "Кон. ст. заполнения калибра"}
     };
 
     public override Dictionary<string, string> OutputLabels => new Dictionary<string, string>
     {
-        {"Result1", "Высота раската" },
-        {"Result2", "Ширина калибра" },
-        {"Result3", "Ширина раската" },
+        {"Result1", "Высота раската, мм" },
+        {"Result2", "Ширина калибра, мм" },
+        {"Result3", "Ширина раската, мм" },
         {"Result4", "Коэф. уширения" },
         {"Result5", "Разница значений" },
-        {"Result6", "Ширина выреза ручья" },
+        {"Result6", "Ширина выреза ручья, мм" },
         {"A1", "Отношение нач. диаметра к расч. высоте"}
     };
 
@@ -928,7 +897,7 @@ public class SquareRhombusMode : CalculationMode
         return CalculationModule.CalculateSquareRhombus(inputs);
     }
 
-    public override string ImagePath => "Images/square_rhombus.PNG"; // Путь к изображению для режима
+    public override string ImagePath => @"Images/square_rhombus2.PNG";
 }
 
 public class HexagonSquareMode : CalculationMode

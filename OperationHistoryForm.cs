@@ -20,7 +20,7 @@ public class OperationHistoryForm : Form
     // Словарь для хранения параметров каждого режима
     private readonly Dictionary<string, string[]> _modeParameters = new Dictionary<string, string[]>
     {
-        { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "Temp", "KoefVit", "MarkSt", "NachDVal", "A1", "StZapKalib1", "Result1", "Result2", "Result3", "Result4", "Result5", "Result6" } },
+        { "Квадрат-Ромб", new[] { "Width0", "StZapKalib", "Rscrug", "Temp", "KoefVit", "MarkSt", "NachDVal", "StZapKalib1", "Result1", "Result2", "Result3", "Result4", "Result5", "Result6", "A1" } },
         { "Квадрат-Овал", new[] { "Width0", "Square0", "Height1", "Bvr", "Bk", "rscrug", "NachDVal", "MarkSt", "Temp", "Result1", "Result2", "Result3", } },
         { "Шестиугольник-Квадрат", new[] { "Width0", "MarkSt", "NachDVal", "Result1" } }
     };
@@ -96,44 +96,23 @@ public class OperationHistoryForm : Form
         this.Controls.Add(historyDataGridView);
 
         // Кнопка "Load Data"
-        loadButton = new Button { Location = new Point(220, 10), Size = new Size(100, 30), Text = "Load Data" };
+        loadButton = new Button { Location = new Point(220, 10), Size = new Size(100, 30), Text = "Обновить" };
         loadButton.Click += LoadButton_Click;
         this.Controls.Add(loadButton);
 
         // Кнопка "Edit"
-        editButton = new Button { Location = new Point(330, 10), Size = new Size(100, 30), Text = "Edit" };
+        editButton = new Button { Location = new Point(330, 10), Size = new Size(100, 30), Text = "Изменить" };
         editButton.Click += EditButton_Click;
         this.Controls.Add(editButton);
 
         // Кнопка "Delete"
-        deleteButton = new Button { Location = new Point(440, 10), Size = new Size(100, 30), Text = "Delete" };
+        deleteButton = new Button { Location = new Point(440, 10), Size = new Size(100, 30), Text = "Удалить запись" };
         deleteButton.Click += DeleteButton_Click;
         this.Controls.Add(deleteButton);
     }
 
 
-    private string GenerateHistoryPrintText()
-    {
-        StringBuilder sb = new StringBuilder();
-
-        sb.AppendLine("История операций:");
-        sb.AppendLine();
-
-        // Получаем данные из DataGridView
-        foreach (DataGridViewRow row in historyDataGridView.Rows)
-        {
-            if (!row.IsNewRow)
-            {
-                for (int i = 0; i < row.Cells.Count; i++)
-                {
-                    sb.Append($"{historyDataGridView.Columns[i].HeaderText}: {row.Cells[i].Value} | ");
-                }
-                sb.AppendLine();
-            }
-        }
-
-        return sb.ToString();
-    }
+   
 
     private void LoadOperationTypes()
     {

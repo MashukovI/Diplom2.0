@@ -34,7 +34,7 @@ public class EditCalculationForm : Form
         {"MarkSt", "Марка стали"},
         {"Temp", "Температура раската"},
         {"NachDVal", "Нач диаметр валков"},
-        {"A1", "Отношение нач. диаметра к расч. высоте"},
+        
         {"StZapKalib1", "Кон. ст. заполнения калибра"},
         {"Width0", "Ширина квадратой формы"},
         {"Square0", "Площадь раската"},
@@ -42,7 +42,7 @@ public class EditCalculationForm : Form
         {"Bvr", "Ширена овальной формы"},
         {"Bk", "Ширина калибра"},
         {"rscrug", "Радиус скругления"},
-
+        {"A1", "Отношение нач. диаметра к расч. высоте"},
 
 
     };
@@ -57,47 +57,42 @@ public class EditCalculationForm : Form
 
     private void InitializeComponents()
     {
-        this.Size = new Size(500, 700); // Увеличиваем высоту формы для новых полей
+        this.Size = new Size(500, 540); // Увеличиваем высоту формы для новых полей
         this.Text = "Edit Calculation";
 
         // Создаем и размещаем элементы
         int y = 10;
 
         // Создаем текстовые поля для всех возможных параметров
-        txtWidth0 = CreateLabeledTextBox("Width0:", ref y);
-        txtStZapKalib = CreateLabeledTextBox("StZapKalib:", ref y);
-        txtRscrug = CreateLabeledTextBox("Rscrug:", ref y);
-        txtKoefVit = CreateLabeledTextBox("KoefVit:", ref y);
-        txtMarkSt = CreateLabeledTextBox("MarkSt:", ref y);
-        txtTemp = CreateLabeledTextBox("Temp:", ref y);
-        txtNachDVal = CreateLabeledTextBox("NachDVal:", ref y);
-        txtA1 = CreateLabeledTextBox("A1:", ref y);
-        txtStZapKalib1 = CreateLabeledTextBox("StZapKalib1:", ref y);
-        txtSquare0 = CreateLabeledTextBox("Square0:", ref y);
-        txtHeight1 = CreateLabeledTextBox("Height1:", ref y);
-        txtBvr = CreateLabeledTextBox("Bvr:", ref y);
-        txtBk = CreateLabeledTextBox("Bk:", ref y);
-        txtrscrug = CreateLabeledTextBox("rscrug:", ref y);
+        txtWidth0 = CreateLabeledTextBox("Сторона квадрата, мм:", ref y);
+        txtStZapKalib = CreateLabeledTextBox("Нач. ст. заполнения калибра:", ref y);
+        txtRscrug = CreateLabeledTextBox("Радиус скругления, °:", ref y);
+        txtKoefVit = CreateLabeledTextBox("Коэффициент вытяжки:", ref y);
+        txtMarkSt = CreateLabeledTextBox("Марка стали:", ref y);
+        txtTemp = CreateLabeledTextBox("Температура раската, °С:", ref y);
+        txtNachDVal = CreateLabeledTextBox("Нач диаметр валков, мм:", ref y);
+        txtA1 = CreateLabeledTextBox("Отношение нач. диаметра к расч. высоте:", ref y);
+        txtStZapKalib1 = CreateLabeledTextBox("Нач. ст. заполнения калибра:", ref y);
 
         // Поля результатов (заблокированы для редактирования)
-        txtResult1 = CreateLabeledTextBox("Result1:", ref y);
+        txtResult1 = CreateLabeledTextBox("Высота раската, мм:", ref y);
         txtResult1.ReadOnly = true;
-        txtResult2 = CreateLabeledTextBox("Result2:", ref y);
+        txtResult2 = CreateLabeledTextBox("Ширина калибра, мм:", ref y);
         txtResult2.ReadOnly = true;
-        txtResult3 = CreateLabeledTextBox("Result3:", ref y);
+        txtResult3 = CreateLabeledTextBox("Ширина раската, мм", ref y);
         txtResult3.ReadOnly = true;
-        txtResult4 = CreateLabeledTextBox("Result4:", ref y);
+        txtResult4 = CreateLabeledTextBox("Коэф. уширения:", ref y);
         txtResult4.ReadOnly = true;
-        txtResult5 = CreateLabeledTextBox("Result5:", ref y);
+        txtResult5 = CreateLabeledTextBox("Разница значений:", ref y);
         txtResult5.ReadOnly = true;
-        txtResult6 = CreateLabeledTextBox("Result6:", ref y);
+        txtResult6 = CreateLabeledTextBox("Ширина выреза ручья, мм:", ref y);
         txtResult6.ReadOnly = true;
 
         // Кнопка сохранения
         btnSave = new Button
         {
-            Text = "Save",
-            Location = new Point(150, y + 20),
+            Text = "Сохранить",
+            Location = new Point(150, y + 5),
             Size = new Size(100, 30)
         };
         btnSave.Click += BtnSave_Click;

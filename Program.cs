@@ -15,7 +15,7 @@ namespace Test
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            string connectionString = "Server=localhost;Database=DBDiplom;Trusted_Connection=True;";
+            string connectionString = "Server=localhost;Database=DBDiplom;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;";
             DatabaseService databaseService = new DatabaseService(connectionString);
 
             while (true)

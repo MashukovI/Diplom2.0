@@ -41,44 +41,6 @@ public static class CalculationModule
     private const double ConstantTr3C1 = -2.486;
 
 
-    // Таблица значений трения
-
-    private static List<(double Temperature, double FrictionCoefficient)> _frictionTableKvR = new List<(double, double)>
-    {
-        (900, 1),
-        (950, 0.87),
-        (1000, 0.77),
-        (1050, 0.68),
-        (1100, 0.6),
-        (1150, 0.55),
-        (1200, 0.49),
-        (1250, 0.45),
-    };
-    private static List<(double Temperature, double FrictionCoefficient)> _frictionTableAll = new List<(double, double)>
-    {
-        (900, 1),
-        (950, 0.92),
-        (1000, 0.86),
-        (1050, 0.8),
-        (1100, 0.75),
-        (1150, 0.7),
-        (1200, 0.65),
-        (1250, 0.61),
-    };
-    // Получение ближайшего значения трения
-    public static double GetClosestFriction(double Temp)
-    {
-        return _frictionTableKvR
-            .OrderBy(data => Math.Abs(data.Temperature - Temp))
-            .First().FrictionCoefficient;
-    }
-    public static double GetClosestFrictionAll(double Temp)
-    {
-        return _frictionTableAll
-            .OrderBy(data => Math.Abs(data.Temperature - Temp))
-            .First().FrictionCoefficient;
-    }
-
     // Режим "Квадрат-Ромб"
     public static double[] CalculateSquareRhombus(double[] inputs)
     {
@@ -245,7 +207,7 @@ public static class CalculationModule
         double MarkSt = inputs[7];
         double Temp = inputs[8];
 
-        double TempTabl = GetClosestFrictionAll(Temp);
+        double TempTabl = (Temp >= 900) ? ConstantTr1C0 * Math.Pow((Temp / 1000), ConstantTr1C1) : 1;
         // Пример формул
         double A = (NachDVal - Height1) / Height1;
         double ak = Bk / Height1;
@@ -288,34 +250,149 @@ public static class CalculationModule
 
     public static double[] CalculateOvalSquare(double[] inputs)
     {
-        if (inputs.Length != 9)
-            throw new ArgumentException("Для режима 'Овал-Квадрат' требуется 9 входных параметров.");
+        // 1. Валидация входных данных
+        if (inputs == null || inputs.Length != 9)
+            throw new ArgumentException("Требуется 8 входных параметров");
 
-        double width0 = inputs[0];
-        double Square0 = inputs[1];
-        double Height1 = inputs[2];
-        double Bvr = inputs[3];
-        double Bk = inputs[4];
-        double rscrug = inputs[5];
-        double NachDVal = inputs[6];
-        double MarkSt = inputs[7];
-        double Temp = inputs[8];
+        // 2. Извлечение параметров с понятными именами
+        double initialSize = inputs[0];          // Ширина исходного квадрата
+        double initialSize2 = inputs[1];          // Ширина исходного квадрата
+        double calibrationFactor = inputs[2];    // Коэффициент калибровки
+        double cornerRadius = inputs[3];         // Радиус скругления
+        double deformationRatio = inputs[4];     // Коэффициент деформации
+        double materialGrade = inputs[5];        // Марка стали
+        double temperature = inputs[6];          // Температура
+        double targetDiameter = inputs[7];       // Целевой диаметр
+        double finalCalibration = inputs[8];     // Финальный коэффициент калибровки
 
-        double TempTabl = GetClosestFrictionAll(Temp);
-        // Пример формул
-        double A = (NachDVal - Height1) / Height1;
-        double ak = Bk / Height1;
-        double OdinNaEta = width0 / Height1;
-        double Beta = Constant1 + ConstantOvC0 * Math.Pow((OdinNaEta - Constant1), ConstantOvC1) * Math.Pow(A, ConstantOvC2)
-            * Math.Pow(ak, ConstantOvC4) * Math.Pow(TempTabl, ConstantOvC6);
-        double B1 = Beta * width0;
-        double StZapKalib = B1 * Bk;
-        double W1 = (Constant0d6 * (Constant2d07 - StZapKalib) * (ak + Constant0d66 * StZapKalib - Constant0d43)) * Constant192;
-        double KoefVit = width0 / W1;
-        double result1 = B1;
-        double result2 = StZapKalib;
-        double result3 = KoefVit;
-        return new double[] { result1, result2, result3 };
+        // 3. Получение коэффициента трения для температуры
+        double frictionCoeff = (temperature >= 900) ? ConstantTr1C0 * Math.Pow((temperature / 1000), ConstantTr1C1) : 1;
+        // 4. Расчет постоянных величин
+        double theoreticalHeight = Math.Sqrt(Math.Pow(initialSize,2) + Math.Pow(initialSize2, 2));
+        double actualHeight = Math.Sqrt(2) * initialSize - Constant0d83 * cornerRadius;
+        double initialWidth = theoreticalHeight * calibrationFactor;
+        double initialArea = (calibrationFactor * (Constant2 - calibrationFactor) -
+                             ConstantW0d43 * Math.Pow(cornerRadius / initialSize, 2)) *
+                             Math.Pow(initialSize, 2);
+        double targetArea = initialArea / deformationRatio;
+
+        // 5. Функция расчета отклонения
+        (double height, double widthK, double width1, double beta, double deviation) Calculate(double a1Candidate)
+        {
+            double ratio = a1Candidate / finalCalibration;
+            double areaComponent = Constant0d5 * ratio * finalCalibration * (Constant2 - finalCalibration) -
+                                  (Constant0d43 * Math.Pow(cornerRadius / initialWidth, 2));
+
+            double h1 = Math.Sqrt(targetArea / areaComponent);
+            double Bk = h1 * ratio;
+            double B1 = Bk * finalCalibration;
+
+            double reduction = (targetDiameter - h1) / h1;
+            double etaRatio = actualHeight / h1;
+            double heightRatio = actualHeight / theoreticalHeight;
+
+            double betaValue = Constant1 +
+                ConstantKvC0 * Math.Pow(etaRatio - Constant1, ConstantKvC1) *
+                Math.Pow(reduction, ConstantKvC2) *
+                Math.Pow(ratio, ConstantKvC4) *
+                Math.Pow(heightRatio, ConstantKvC5) *
+                Math.Pow(frictionCoeff, ConstantKvC6);
+
+            double expandedWidth = betaValue * initialWidth;
+            double dev = ((expandedWidth - B1) / B1) * 100;
+
+            return (h1, Bk, B1, betaValue, dev);
+        }
+
+        // 6. Алгоритм золотого сечения для поиска оптимального A1
+        double a = 0.1, b = 10.0;
+        const double goldenRatio = 1.618033988749895;
+        const double tolerance = 0.05;
+        int maxIterations = 100;
+        double optimalA1 = 0;
+        double finalDeviation = double.MaxValue;
+
+        for (int i = 0; i < maxIterations; i++)
+        {
+            double a1 = b - (b - a) / goldenRatio;
+            double a2 = a + (b - a) / goldenRatio;
+
+            var res1 = Calculate(a1);
+            var res2 = Calculate(a2);
+
+            if (Math.Abs(res1.deviation) < Math.Abs(res2.deviation))
+            {
+                b = a2;
+                if (Math.Abs(res1.deviation) < tolerance)
+                {
+                    optimalA1 = a1;
+                    finalDeviation = res1.deviation;
+                    break;
+                }
+            }
+            else
+            {
+                a = a1;
+                if (Math.Abs(res2.deviation) < tolerance)
+                {
+                    optimalA1 = a2;
+                    finalDeviation = res2.deviation;
+                    break;
+                }
+            }
+        }
+
+        // 7. Если не нашли в основном диапазоне, расширяем поиск
+        if (finalDeviation > tolerance)
+        {
+            a = 0.01;
+            b = 100.0;
+
+            for (int i = 0; i < maxIterations; i++)
+            {
+                double a1 = b - (b - a) / goldenRatio;
+                double a2 = a + (b - a) / goldenRatio;
+
+                var res1 = Calculate(a1);
+                var res2 = Calculate(a2);
+
+                if (Math.Abs(res1.deviation) < Math.Abs(res2.deviation))
+                {
+                    b = a2;
+                    if (Math.Abs(res1.deviation) < tolerance)
+                    {
+                        optimalA1 = a1;
+                        finalDeviation = res1.deviation;
+                        break;
+                    }
+                }
+                else
+                {
+                    a = a1;
+                    if (Math.Abs(res2.deviation) < tolerance)
+                    {
+                        optimalA1 = a2;
+                        finalDeviation = res2.deviation;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 8. Финальный расчет
+        var finalResults = Calculate(optimalA1);
+        double result6 = finalResults.widthK - Constant2 * (optimalA1 / finalCalibration);
+
+        // 9. Возврат результатов
+        return new double[] {
+        finalResults.height,    // result1: расчетная высота
+        finalResults.widthK,    // result2: расчетная ширина калибра
+        finalResults.width1,    // result3: предварительная ширина раската
+        finalResults.beta,      // result4: коэффициент уширения beta
+        finalDeviation,         // result5: отклонение  
+        result6,               // result6: итоговая ширина раската
+        optimalA1             // Оптимальное A1
+    };
     }
 
     public static double[] CalculateOvalCircle(double[] inputs)
@@ -333,7 +410,7 @@ public static class CalculationModule
         double MarkSt = inputs[7];
         double Temp = inputs[8];
 
-        double TempTabl = GetClosestFrictionAll(Temp);
+        double TempTabl = (Temp >= 900) ? ConstantTr1C0 * Math.Pow((Temp / 1000), ConstantTr1C1) : 1;
         // Пример формул
         double A = (NachDVal - Height1) / Height1;
         double ak = Bk / Height1;
