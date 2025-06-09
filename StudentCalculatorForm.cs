@@ -837,7 +837,7 @@ public class SquareOvalMode : CalculationMode
         {"Width0", "Ширина квадратой формы"},
         {"Square0", "Площадь раската"},
         {"Height1", "Высота овальной формы"},
-        {"Bvr", "Ширена овальной формы"},
+        {"Bvr", "Ширина овальной формы"},
         {"Bk", "Ширина калибра"},
         {"rscrug", "Радиус скругления"},
         {"NachDVal", "Нач диаметр валков."},
@@ -849,9 +849,13 @@ public class SquareOvalMode : CalculationMode
 
     public override Dictionary<string, string> OutputLabels => new Dictionary<string, string>
     {
-        {"Result1", "Ширина раската" },
-        {"Result2", "Кон. ст. заполнения калибра" },
-        {"Result3", "Коэффициент вытяжки" },
+        {"Result1", "Высота раската, мм" },
+        {"Result2", "Ширина калибра, мм" },
+        {"Result3", "Ширина раската, мм" },
+        {"Result4", "Коэф. уширения" },
+        {"Result5", "Разница значений" },
+        {"Result6", "Ширина выреза ручья, мм" },
+        {"A1", "Отношение нач. диаметра к расч. высоте"}
 
     };
 
@@ -906,15 +910,15 @@ public class HexagonSquareMode : CalculationMode
 
     public override Dictionary<string, string> InputLabels => new Dictionary<string, string>
     {
-        {"Width0", "Ширина"},
-        {"StZapKalib", "Нач. ст. заполнения калибра"},
-        {"Rscrug", "Радиус скругления"},
+        {"Width0", "Диаметр шестиугольника, мм"},
+        {"StZapKalib", "Степень заполнения калибра"},
+        {"Rscrug", "Радиус скругления, мм"},
         {"KoefVit", "Коэффициент вытяжки"},
         {"MarkSt", "Марка стали"},
-        {"Temp", "Температура раската"},
-        {"NachDVal", "Нач диаметр валков"},
-        {"A1", "Отношение нач. диаметра к расч. высоте"},
-        {"StZapKalib1", "Кон. ст. заполнения калибра"}
+        {"Temp", "Температура раската, °C"},
+        {"NachDVal", "Начальный диаметр валков, мм"},
+        
+        {"StZapKalib1", "Конечная степень заполнения"}
     };
 
     public override Dictionary<string, string> OutputLabels => new Dictionary<string, string>
@@ -924,7 +928,8 @@ public class HexagonSquareMode : CalculationMode
         {"Result3", "Ширина раската" },
         {"Result4", "Коэф. уширения" },
         {"Result5", "Разница значений" },
-        {"Result6", "Ширина выреза ручья" }
+        {"Result6", "Ширина выреза ручья" },
+        {"A1", "Отношение диаметра к высоте"}
     };
 
     public override double[] Calculate(double[] inputs)
@@ -932,7 +937,7 @@ public class HexagonSquareMode : CalculationMode
         return CalculationModule.CalculateHexagonSquare(inputs);
     }
 
-    public override string ImagePath => "Images/square_rhombus.PNG"; // Путь к изображению для режима
+    public override string ImagePath => "Images/hexagon_square3.PNG"; // Путь к изображению для режима
 }
 
 public class OvalSquareMode : CalculationMode
@@ -967,7 +972,7 @@ public class OvalSquareMode : CalculationMode
         return CalculationModule.CalculateOvalSquare(inputs);
     }
 
-    public override string ImagePath => "Images/square_rhombus.PNG"; // Путь к изображению для режима
+    public override string ImagePath => "Images/hexagon_oval.PNG"; // Путь к изображению для режима
 }
 
 public class OvalCircleMode : CalculationMode

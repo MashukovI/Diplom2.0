@@ -1,14 +1,18 @@
-﻿using System;
+﻿using CalibrationApp;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 
 public class OperationHistoryForm : Form
 {
+
+    
+    private Button ChartButton;
     private DataGridView historyDataGridView;
     private Button loadButton;
     private Button editButton;
@@ -109,6 +113,11 @@ public class OperationHistoryForm : Form
         deleteButton = new Button { Location = new Point(440, 10), Size = new Size(100, 30), Text = "Удалить запись" };
         deleteButton.Click += DeleteButton_Click;
         this.Controls.Add(deleteButton);
+
+        ChartButton = new Button { Location = new Point(550, 10), Size = new Size(100, 30), Text = "dadada" };
+        ChartButton.Click += ShowChartButton_Click;
+        this.Controls.Add(ChartButton);
+
     }
 
 
@@ -142,7 +151,7 @@ public class OperationHistoryForm : Form
         LoadData(selectedOperationType);
     }
 
-    private void LoadData(string mode = "Квадрат-Овал")
+    private void LoadData(string mode = "Квадрат-Ромб")
     {
         try
         {
@@ -285,7 +294,12 @@ public class OperationHistoryForm : Form
     {
         LoadData();
     }
-
+    private void ShowChartButton_Click(object sender, EventArgs e)
+    {
+        ChartForm chartForm = new ChartForm(_databaseService);
+        chartForm.ShowDialog();
+        LoadData();
+    }
     private void EditButton_Click(object sender, EventArgs e)
     {
         if (historyDataGridView.SelectedRows.Count == 0)
